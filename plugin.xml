@@ -1,37 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
-        id="com.add.exoplayer"
-        version="0.0.1">
+        id="co.frontyard.cordova.plugin.exoplayer"
+        version="1.0.0">
 
-  <name>ExoPlayer</name>
+    <name>ExoPlayer</name>
 
-  <engines>
-    <engine name="cordova" version=">=3.4.0"/>
-  </engines>
+    <engines>
+        <engine name="cordova" version=">=3.4.0"/>
+    </engines>
 
-  <asset src="www/exoplayer.js" target="js/exoplayer.js"/>
+    <asset src="www/exoplayer.js" target="js/exoplayer.js"/>
 
-  <js-module src="www/exoplayer.js" name="exoplayer">
-    <clobbers target="exoplayer" />
-  </js-module>
+    <js-module src="www/exoplayer.js" name="exoplayer">
+        <clobbers target="exoplayer"/>
+    </js-module>
 
-  <platform name="android">
+    <platform name="android">
 
-    <framework src="com.google.android.exoplayer:exoplayer:r2.2.0" />
-    <framework src="com.squareup.picasso:picasso:2.5.2" />
+        <framework src="com.google.android.exoplayer:exoplayer:r2.2.0"/>
+        <framework src="com.squareup.picasso:picasso:2.5.2"/>
 
-    <config-file target="res/xml/config.xml" parent="/*">
-      <feature name="ExoPlayer">
-        <param name="android-package" value="com.add.exoplayer.ExoPlayer"/>
-      </feature>
-    </config-file>
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="ExoPlayer">
+                <param name="android-package" value="co.frontyard.cordova.plugin.exoplayer.Plugin"/>
+            </feature>
+        </config-file>
 
-    <source-file src="src/android/ExoPlayer.java" target-dir="src/com/add/exoplayer/"/>
-    <source-file src="src/android/CallbackManager.java" target-dir="src/com/add/exoplayer/"/>
-    <source-file src="src/android/LayoutManager.java" target-dir="src/com/add/exoplayer/"/>
-    <source-file src="src/android/LayoutProvider.java" target-dir="src/com/add/exoplayer/"/>
-    <source-file src="src/android/Entity.java" target-dir="src/com/add/exoplayer/"/>
-    <source-file src="src/android/Payload.java" target-dir="src/com/add/exoplayer/"/>
-  </platform>
-
+        <source-file src="src/android/CallbackResponse.java" target-dir="src/co/frontyard/cordova/plugin/exoplayer/"/>
+        <source-file src="src/android/Configuration.java" target-dir="src/co/frontyard/cordova/plugin/exoplayer/"/>
+        <source-file src="src/android/LayoutProvider.java" target-dir="src/co/frontyard/cordova/plugin/exoplayer/"/>
+        <source-file src="src/android/Payload.java" target-dir="src/co/frontyard/cordova/plugin/exoplayer/"/>
+        <source-file src="src/android/Player.java" target-dir="src/co/frontyard/cordova/plugin/exoplayer/"/>
+        <source-file src="src/android/Plugin.java" target-dir="src/co/frontyard/cordova/plugin/exoplayer/"/>
+    </platform>
 </plugin>

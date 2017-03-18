@@ -1,36 +1,35 @@
-package com.add.exoplayer;
+package co.frontyard.cordova.plugin.exoplayer;
 
-import android.net.Uri;
-import android.view.Gravity;
+import android.net.*;
+import android.view.*;
+import org.json.*;
 
-import org.json.JSONObject;
-
-public class Entity {
+public class Configuration {
 
     public static final String DASH = "dash";
 
-    private final JSONObject entity;
+    private final JSONObject config;
     private final JSONObject header;
 
-    public Entity(JSONObject entity) {
-        this.entity = entity;
-        this.header = entity.optJSONObject("header");
+    public Configuration(JSONObject config) {
+        this.config = config;
+        this.header = config.optJSONObject("header");
     }
 
-    public boolean isDash() {
-        return this.entity.optString("type", "dash").equalsIgnoreCase(DASH);
+    public String getType() {
+        return this.config.optString("type", "dash").toLowerCase();
     }
 
     public final Uri getUri() {
-        return Uri.parse(entity.optString("url", ""));
+        return Uri.parse(config.optString("url", ""));
     }
 
     public String getUserAgent() {
-        return this.entity.optString("user_agent", "PluginExoPlayer");
+        return this.config.optString("user_agent", "PluginExoPlayer");
     }
 
     public boolean isVisibleControls() {
-        return entity.optBoolean("plugin_controls_visible", true);
+        return config.optBoolean("plugin_controls_visible", true);
     }
 
     public boolean hasHeader() {
@@ -40,7 +39,7 @@ public class Entity {
     public int getHeaderHeight() {
         return header.optInt("height", 150);
     }
-    
+
     public int getPadding() {
         return header.optInt("padding", 20);
     }
@@ -63,9 +62,15 @@ public class Entity {
 
     public int getHeaderTextGravity() {
         String align = header.optString("text_align", "left");
-        if (align.equalsIgnoreCase("center")) return Gravity.CENTER;
-        else if (align.equalsIgnoreCase("right")) return Gravity.RIGHT;
-        else return Gravity.LEFT;
+        if (align.equalsIgnoreCase("center")) {
+            return Gravity.CENTER;
+        }
+        else if (align.equalsIgnoreCase("right")) {
+            return Gravity.RIGHT;
+        }
+        else {
+            return Gravity.LEFT;
+        }
     }
 
     public String getHeaderText() {
@@ -73,15 +78,15 @@ public class Entity {
     }
 
     public boolean isAspectRatioFillScreen() {
-        return entity.optString("aspect_ratio", "fit_screen").equalsIgnoreCase("fill_screen");
+        return config.optString("aspect_ratio", "fit_screen").equalsIgnoreCase("fill_screen");
     }
 
     public boolean isFullscreen() {
-        return entity.optBoolean("full_screen", true);
+        return config.optBoolean("full_screen", true);
     }
 
     public boolean publishRawTouchEvents() {
-        return entity.optBoolean("raw_touch_events", true);
+        return config.optBoolean("raw_touch_events", true);
     }
 
     public int getTheme() {
