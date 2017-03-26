@@ -277,8 +277,12 @@ public class Player {
 
     private void setTexView(String text) {
         String[] split = text.split("\n");
-        textView.setText(split[0]);
-        textView2.setText(split[1]);
+        if(split.length > 0) {
+            textView.setText(split[0]);
+        }
+        if(split.length > 1) {
+            textView2.setText(split[1]);
+        }
     }
 
     public void setStream(String type, Uri url) {
