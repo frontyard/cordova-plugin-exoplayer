@@ -1,6 +1,6 @@
 # Cordova ExoPlayer Plugin
 
-Currently supporting DASH and HSL and has an optional stylable header.
+Currently supporting DASH and HLS and has an optional stylable header.
 
 ## Using
 
