@@ -9,8 +9,8 @@ module.exports = {
             setText: function (text, successCallback, errorCallback) {
                 cordova.exec(successCallback, errorCallback, "ExoPlayer", "setText", [text]);
             },
-            setStream: function (type, url, successCallback, errorCallback) {
-                cordova.exec(successCallback, errorCallback, "ExoPlayer", "setStream", [type, url]);
+            setStream: function (url, successCallback, errorCallback) {
+                cordova.exec(successCallback, errorCallback, "ExoPlayer", "setStream", [url]);
             },
             play: function (successCallback, errorCallback) {
                 cordova.exec(successCallback, errorCallback, "ExoPlayer", "play", []);
