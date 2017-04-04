@@ -39,7 +39,7 @@ Plugin methods
     show(successCallback, errorCallback) // show player and add main callbacks
     
     setText("some text\nsome other text") // change header text on intialized player
-    setStream(type, url) // switch stream
+    setStream(url) // switch stream
 
     play() 
     pause()
@@ -54,7 +54,6 @@ Plugin methods
 Player parameters set on initialization
 ```js
 {
-    type: "dash", // hls or dash
     user_agent: "PluginExoPlayer", 
     plugin_controls_visible: false, // exoplayer controls visibilty
 
