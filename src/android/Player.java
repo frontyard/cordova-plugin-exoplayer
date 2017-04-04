@@ -7,9 +7,11 @@ import android.os.*;
 import android.view.*;
 import android.widget.*;
 import com.google.android.exoplayer2.*;
+import com.google.android.exoplayer2.extractor.*;
 import com.google.android.exoplayer2.source.*;
 import com.google.android.exoplayer2.source.dash.*;
 import com.google.android.exoplayer2.source.hls.*;
+import com.google.android.exoplayer2.source.smoothstreaming.*;
 import com.google.android.exoplayer2.trackselection.*;
 import com.google.android.exoplayer2.ui.*;
 import com.google.android.exoplayer2.upstream.*;
@@ -109,7 +111,7 @@ public class Player {
             }
 
             if (!config.isVisibleControls() && event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-                if (header.getVisibility() == View.VISIBLE) {
+                if (null != header && header.getVisibility() == View.VISIBLE) {
                     hide();
                 }
                 else {
@@ -213,11 +215,10 @@ public class Player {
                 show();
             }
         }
-        preparePlayer(config.getType(), config.getUri());
+        preparePlayer(config.getUri());
     }
 
-    private void preparePlayer(String type, Uri url) {
-        Handler mainHandler = new Handler();
+    private void preparePlayer(Uri uri) {
         DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
         TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveVideoTrackSelection.Factory(bandwidthMeter);
         TrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
@@ -228,10 +229,7 @@ public class Player {
 
         exoView.setPlayer(exoPlayer);
 
-        String userAgent = Util.getUserAgent(this.activity, config.getUserAgent());
-        HttpDataSource.Factory httpDataSourceFactory = new DefaultHttpDataSourceFactory(userAgent, bandwidthMeter);
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this.activity, bandwidthMeter, httpDataSourceFactory);
-        MediaSource mediaSource = getMediaSource(userAgent, dataSourceFactory, mainHandler, type, url);
+        MediaSource mediaSource = getMediaSource(uri, bandwidthMeter);
         if (mediaSource != null) {
             exoPlayer.prepare(mediaSource);
             exoPlayer.setPlayWhenReady(true);
@@ -241,16 +239,27 @@ public class Player {
         // TODO Exception?
     }
 
-    private MediaSource getMediaSource(String userAgent, DataSource.Factory dataSourceFactory, Handler mainHandler, String type, Uri uri) {
-        if (type.equals("dash")) {
-            return new DashMediaSource(uri,
-                    new DefaultDataSourceFactory(this.activity, null, new DefaultHttpDataSourceFactory(userAgent, null)),
-                    new DefaultDashChunkSource.Factory(dataSourceFactory), mainHandler, null);
+    private MediaSource getMediaSource(Uri uri, DefaultBandwidthMeter bandwidthMeter) {
+        String userAgent = Util.getUserAgent(this.activity, config.getUserAgent());
+        Handler mainHandler = new Handler();
+        HttpDataSource.Factory httpDataSourceFactory = new DefaultHttpDataSourceFactory(userAgent, bandwidthMeter);
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this.activity, bandwidthMeter, httpDataSourceFactory);
+
+        int type = Util.inferContentType(uri.toString());
+        switch(type) {
+            case C.TYPE_DASH:
+                DefaultDashChunkSource.Factory dashChunkSourceFactory = new DefaultDashChunkSource.Factory(dataSourceFactory);
+                return new DashMediaSource(uri, new DefaultDataSourceFactory(this.activity, null, new DefaultHttpDataSourceFactory(userAgent, null)),
+                        dashChunkSourceFactory, mainHandler, null);
+            case C.TYPE_HLS:
+                return new HlsMediaSource(uri, dataSourceFactory, mainHandler, null);
+            case C.TYPE_SS:
+                DefaultSsChunkSource.Factory ssChunkSourceFactory = new DefaultSsChunkSource.Factory(dataSourceFactory);
+                return new SsMediaSource(uri, dataSourceFactory, ssChunkSourceFactory, mainHandler, null);
+            default:
+                ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+                return new ExtractorMediaSource(uri, dataSourceFactory, extractorsFactory, mainHandler, null);
         }
-        else if (type.equals("hls")) {
-            return new HlsMediaSource(uri, dataSourceFactory, mainHandler, null);
-        }
-        throw null;
     }
 
     public void close() {
@@ -285,10 +294,10 @@ public class Player {
         }
     }
 
-    public void setStream(String type, Uri url) {
+    public void setStream(Uri url) {
         exoPlayer.release();
         exoPlayer = null;
-        preparePlayer(type, url);
+        preparePlayer(url);
     }
 
     public void play() {

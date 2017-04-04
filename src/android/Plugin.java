@@ -44,11 +44,10 @@ public class Plugin extends CordovaPlugin {
                 if (this.player == null) {
                     return false;
                 }
-                final String type = data.optString(0, "dash");
-                final String url = data.optString(1, "");
+                final String url = data.optString(0, "");
                 cordova.getActivity().runOnUiThread(new Runnable() {
                     public void run() {
-                        Plugin.this.player.setStream(type, Uri.parse(url));
+                        Plugin.this.player.setStream(Uri.parse(url));
                     }
                 });
 

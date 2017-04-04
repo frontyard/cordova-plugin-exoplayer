@@ -16,10 +16,6 @@ public class Configuration {
         this.header = config.optJSONObject("header");
     }
 
-    public String getType() {
-        return this.config.optString("type", "dash").toLowerCase();
-    }
-
     public final Uri getUri() {
         return Uri.parse(config.optString("url", ""));
     }
