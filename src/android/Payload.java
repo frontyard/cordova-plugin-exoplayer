@@ -73,6 +73,9 @@ public class Payload {
         Map<String, String> map = new HashMap<String, String>();
         map.put("event_type", "state_changed_event");
         map.put("playback_state", state);
+        map.put("playing", Boolean.toString(player.getPlayWhenReady()));
+        map.put("duration", Long.toString(player.getDuration()));
+        map.put("position", Long.toString(player.getCurrentPosition()));
         return new JSONObject(map);
     }
 

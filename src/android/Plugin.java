@@ -1,6 +1,7 @@
 package co.frontyard.cordova.plugin.exoplayer;
 
 import android.net.*;
+import android.view.ViewGroup;
 import org.apache.cordova.*;
 import org.json.*;
 
@@ -16,24 +17,12 @@ public class Plugin extends CordovaPlugin {
                     // TODO Do we need to send this back to the app?
                     //new CallbackResponse(callbackContext).send(PluginResult.Status.OK, true);
                 }
-                this.player = new Player(new Configuration(data.getJSONObject(0)), cordova.getActivity(), callbackContext);
+                this.player = new Player(new Configuration(data.getJSONObject(0)), cordova.getActivity(), callbackContext, webView);
                 cordova.getActivity().runOnUiThread(new Runnable() {
                     public void run() {
                         Plugin.this.player.createDialog();
-                    }
-                });
-
-                new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
-                return true;
-            }
-            else if (action.equals("setText")) {
-                if (this.player == null) {
-                    return false;
-                }
-                final String message = data.optString(0, "");
-                cordova.getActivity().runOnUiThread(new Runnable() {
-                    public void run() {
-                        Plugin.this.player.setText(message);
+                        //webView.getView().setBackgroundColor(0x00000000);
+                        //((ViewGroup)webView.getView()).bringToFront();
                     }
                 });
 
@@ -106,7 +95,7 @@ public class Plugin extends CordovaPlugin {
                 });
 
                 //TODO This is synchronous, while the actual call is async?
-                new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
+                //new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
                 return true;
             }
             else if (action.equals("close")) {

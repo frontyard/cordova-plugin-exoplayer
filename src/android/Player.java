@@ -26,17 +26,15 @@ public class Player {
     private final Configuration config;
     private Dialog dialog;
     private SimpleExoPlayer exoPlayer;
-    private ImageView imageView;
-    private TextView textView;
-    private TextView textView2;
     private SimpleExoPlayerView exoView;
-    private LinearLayout header;
+    private CordovaWebView webView;
     private int showTimeoutMs = 5000;
 
-    public Player(Configuration config, Activity activity, CallbackContext callbackContext) {
+    public Player(Configuration config, Activity activity, CallbackContext callbackContext, CordovaWebView webView) {
         this.config = config;
         this.activity = activity;
         this.callbackContext = callbackContext;
+        this.webView = webView;
     }
 
     private ExoPlayer.EventListener playerEventListener = new ExoPlayer.EventListener() {
@@ -92,7 +90,7 @@ public class Player {
         public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
             JSONObject payload = Payload.keyEvent(event);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
-            return false;
+            return true;
         }
     };
 
@@ -101,73 +99,18 @@ public class Player {
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            if (Player.this.config.publishRawTouchEvents()) {
-                int eventAction = event.getAction();
-                if (previousAction != eventAction) {
-                    previousAction = eventAction;
-                    JSONObject payload = Payload.touchEvent(event);
-                    new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
-                }
+            int eventAction = event.getAction();
+            if (previousAction != eventAction) {
+                previousAction = eventAction;
+                JSONObject payload = Payload.touchEvent(event);
+                new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
             }
-
-            if (!config.isVisibleControls() && event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-                if (null != header && header.getVisibility() == View.VISIBLE) {
-                    hide();
-                }
-                else {
-                    maybeShowController(true);
-                }
-            }
-            return !config.isVisibleControls();
+            return true;
         }
     };
-
-    private final Runnable hideAction = new Runnable() {
-        @Override
-        public void run() {
-            hide();
-        }
-    };
-
-    private void maybeShowController(boolean isForced) {
-        if (!config.hasHeader() || header == null || exoPlayer == null) {
-            return;
-        }
-        int playbackState = exoPlayer.getPlaybackState();
-        boolean showIndefinitely = (playbackState == com.google.android.exoplayer2.ExoPlayer.STATE_IDLE)
-                || (playbackState == com.google.android.exoplayer2.ExoPlayer.STATE_ENDED)
-                || !exoPlayer.getPlayWhenReady();
-        boolean wasShowingIndefinitely = header.getVisibility() == View.VISIBLE && showTimeoutMs <= 0;
-        int controllerShowTimeoutMs = 5000;
-        showTimeoutMs = showIndefinitely ? 0 : controllerShowTimeoutMs;
-        if (isForced || showIndefinitely || wasShowingIndefinitely) {
-            show();
-        }
-    }
-
-    public void show() {
-        if (!(header.getVisibility() == View.VISIBLE)) {
-            header.setVisibility(View.VISIBLE);
-        }
-        hideAfterTimeout();
-    }
-
-    private void hideAfterTimeout() {
-        header.removeCallbacks(hideAction);
-        if (showTimeoutMs > 0) {
-            header.postDelayed(hideAction, showTimeoutMs);
-        }
-    }
-
-    public void hide() {
-        if (header.getVisibility() == View.VISIBLE) {
-            header.setVisibility(View.GONE);
-            header.removeCallbacks(hideAction);
-        }
-    }
 
     public void createDialog() {
-        dialog = new Dialog(this.activity, config.getTheme());
+        dialog = new Dialog(this.activity, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
         dialog.setOnKeyListener(onKeyListener);
         dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -177,44 +120,15 @@ public class Player {
         FrameLayout mainLayout = LayoutProvider.getMainLayout(this.activity);
         exoView = LayoutProvider.getExoPlayer(this.activity, config);
         mainLayout.addView(exoView);
-        if (config.hasHeader()) {
-            header = LayoutProvider.getLinearLayout(this.activity, config, LinearLayout.HORIZONTAL, config.getHeaderHeight(), config.getHeaderColor(), false);
-            header.addView(imageView = LayoutProvider.getImageView(this.activity, config));
-            LinearLayout textHolder = LayoutProvider.getLinearLayout(this.activity, config, LinearLayout.VERTICAL, WindowManager.LayoutParams.MATCH_PARENT, "#00FFFFFF", true);
-            textHolder.addView(textView = LayoutProvider.getTextView(this.activity, config));
-            textHolder.addView(textView2 = LayoutProvider.getTextView(this.activity, config));
-
-            header.addView(textHolder);
-            mainLayout.addView(header);
-        }
         dialog.setContentView(mainLayout);
         dialog.show();
-
         afterDialogIsShown();
     }
 
     private void afterDialogIsShown() {
-        dialog.getWindow().setAttributes(LayoutProvider.getLayoutParams(dialog));
+        dialog.getWindow().setAttributes(LayoutProvider.getDialogLayoutParams(activity, config, dialog));
         exoView.requestFocus();
         exoView.setOnTouchListener(onTouchListener);
-        if (config.hasHeader()) {
-            Picasso.with(imageView.getContext())
-                    .load(config.getHeaderImage())
-                    .into(imageView);
-            setTexView(config.getHeaderText());
-
-            if (config.isVisibleControls()) {
-                exoView.setControllerVisibilityListener(new PlaybackControlView.VisibilityListener() {
-                    @Override
-                    public void onVisibilityChange(int visibility) {
-                        header.setVisibility(visibility);
-                    }
-                });
-            }
-            else {
-                show();
-            }
-        }
         preparePlayer(config.getUri());
     }
 
@@ -231,6 +145,10 @@ public class Player {
 
         MediaSource mediaSource = getMediaSource(uri, bandwidthMeter);
         if (mediaSource != null) {
+            long offset = config.getOffset();
+            if(offset > -1) {
+                exoPlayer.seekTo(offset);
+            }
             exoPlayer.prepare(mediaSource);
             exoPlayer.setPlayWhenReady(true);
             JSONObject payload = Payload.startEvent(exoPlayer);
@@ -272,32 +190,10 @@ public class Player {
         }
     }
 
-    public void setText(String text) {
-        if (textView != null && textView2 != null) {
-            setTexView(text);
-            if (config.isVisibleControls()) {
-                exoView.showController();
-            }
-            else {
-                show();
-            }
-        }
-    }
-
-    private void setTexView(String text) {
-        String[] split = text.split("\n");
-        if(split.length > 0) {
-            textView.setText(split[0]);
-        }
-        if(split.length > 1) {
-            textView2.setText(split[1]);
-        }
-    }
-
-    public void setStream(Uri url) {
-        exoPlayer.release();
-        exoPlayer = null;
-        preparePlayer(url);
+    public void setStream(Uri uri) {
+        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        MediaSource mediaSource = getMediaSource(uri, bandwidthMeter);
+        exoPlayer.prepare(mediaSource);
     }
 
     public void play() {
