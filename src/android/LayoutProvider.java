@@ -21,7 +21,6 @@ public class LayoutProvider {
 
     public static SimpleExoPlayerView getExoPlayer(Activity activity, Configuration config) {
         SimpleExoPlayerView view = new SimpleExoPlayerView(activity);
-        view.setUseController(false);
         view.setLayoutParams(new LinearLayout.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT));
         if (config.isAspectRatioFillScreen()) {
             view.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);

@@ -28,7 +28,6 @@ public class Player {
     private SimpleExoPlayer exoPlayer;
     private SimpleExoPlayerView exoView;
     private CordovaWebView webView;
-    private int showTimeoutMs = 5000;
 
     public Player(Configuration config, Activity activity, CallbackContext callbackContext, CordovaWebView webView) {
         this.config = config;
@@ -119,6 +118,8 @@ public class Player {
 
         FrameLayout mainLayout = LayoutProvider.getMainLayout(this.activity);
         exoView = LayoutProvider.getExoPlayer(this.activity, config);
+        // Disable default controller since it's rather basic.
+        exoView.setUseController(false);
         mainLayout.addView(exoView);
         dialog.setContentView(mainLayout);
         dialog.show();
