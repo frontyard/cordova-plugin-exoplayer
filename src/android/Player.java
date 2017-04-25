@@ -92,6 +92,10 @@ public class Player {
         public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
             JSONObject payload = Payload.keyEvent(event);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
+            
+            //Added method to handle remote key events to show controls on any key event
+            exoView.showController();
+            
             return false;
         }
     };
