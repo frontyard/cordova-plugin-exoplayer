@@ -165,14 +165,31 @@ public class Player {
         }
     }
 
+    private static int inferContentType(String fileName) {
+        fileName = fileName.toLowerCase();
+        if (fileName.endsWith(".mpd")) {
+            return C.TYPE_DASH;
+        }
+        else if (fileName.indexOf(".m3u8") > -1) {
+            return C.TYPE_HLS;
+        }
+        else if (fileName.endsWith(".ism") || fileName.endsWith(".isml")
+                || fileName.endsWith(".ism/manifest") || fileName.endsWith(".isml/manifest")) {
+            return C.TYPE_SS;
+        }
+        else {
+            return C.TYPE_OTHER;
+        }
+    }
+
     private MediaSource getMediaSource(Uri uri, DefaultBandwidthMeter bandwidthMeter) {
         String userAgent = Util.getUserAgent(this.activity, config.getUserAgent());
         Handler mainHandler = new Handler();
         HttpDataSource.Factory httpDataSourceFactory = new DefaultHttpDataSourceFactory(userAgent, bandwidthMeter);
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this.activity, bandwidthMeter, httpDataSourceFactory);
 
-        int type = Util.inferContentType(uri.toString());
-        switch(type) {
+        int type = inferContentType(uri.toString());
+        switch (type) {
             case C.TYPE_DASH:
                 DefaultDashChunkSource.Factory dashChunkSourceFactory = new DefaultDashChunkSource.Factory(dataSourceFactory);
                 return new DashMediaSource(uri, new DefaultDataSourceFactory(this.activity, null, new DefaultHttpDataSourceFactory(userAgent, null)),
