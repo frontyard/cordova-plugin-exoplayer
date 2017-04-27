@@ -24,14 +24,18 @@ public class Configuration {
     }
 
     public String getUserAgent() {
-        return this.config.optString("user_agent", "PluginExoPlayer");
+        return this.config.optString("userAgent", "PluginExoPlayer");
     }
 
     public boolean isAspectRatioFillScreen() {
-        return config.optString("aspect_ratio", "fit_screen").equalsIgnoreCase("fill_screen");
+        return config.optString("aspectRatio", "FIT_SCREEN").equalsIgnoreCase("FILL_SCREEN");
     }
 
     public long getOffset() {
         return this.config.optLong("offset", -1);
+    }
+
+    public boolean isVisibleControls() {
+        return config.optBoolean("controlsVisible", true);
     }
 }

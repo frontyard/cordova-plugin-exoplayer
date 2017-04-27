@@ -14,18 +14,13 @@ public class Plugin extends CordovaPlugin {
             if (action.equals("show")) {
                 if (this.player != null) {
                     this.player.close();
-                    // TODO Do we need to send this back to the app?
-                    //new CallbackResponse(callbackContext).send(PluginResult.Status.OK, true);
                 }
                 this.player = new Player(new Configuration(data.getJSONObject(0)), cordova.getActivity(), callbackContext, webView);
                 cordova.getActivity().runOnUiThread(new Runnable() {
                     public void run() {
                         Plugin.this.player.createDialog();
-                        //webView.getView().setBackgroundColor(0x00000000);
-                        //((ViewGroup)webView.getView()).bringToFront();
                     }
                 });
-
                 new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
                 return true;
             }
@@ -73,7 +68,7 @@ public class Plugin extends CordovaPlugin {
                 if (this.player == null) {
                     return false;
                 }
-                final int seekTime = data.optInt(0, 0);
+                final long seekTime = data.optLong(0, 0);
                 cordova.getActivity().runOnUiThread(new Runnable() {
                     public void run() {
                         Plugin.this.player.seekTo(seekTime);
@@ -93,9 +88,6 @@ public class Plugin extends CordovaPlugin {
                         new CallbackResponse(callbackContext).send(PluginResult.Status.OK, response, false);
                     }
                 });
-
-                //TODO This is synchronous, while the actual call is async?
-                //new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
                 return true;
             }
             else if (action.equals("close")) {

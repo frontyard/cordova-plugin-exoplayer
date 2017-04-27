@@ -4,6 +4,7 @@ import android.app.*;
 import android.content.*;
 import android.net.*;
 import android.os.*;
+import android.util.*;
 import android.view.*;
 import android.widget.*;
 import com.google.android.exoplayer2.*;
@@ -21,6 +22,7 @@ import org.apache.cordova.*;
 import org.json.*;
 
 public class Player {
+    private static final String TAG = "ExoplayerPlugin";
     private final Activity activity;
     private final CallbackContext callbackContext;
     private final Configuration config;
@@ -39,7 +41,8 @@ public class Player {
     private ExoPlayer.EventListener playerEventListener = new ExoPlayer.EventListener() {
         @Override
         public void onPlayerError(ExoPlaybackException error) {
-            JSONObject payload = Payload.playerErrorEvent(Player.this.exoPlayer, error);
+            Log.e(TAG, "Error in ExoPlayer", error);
+            JSONObject payload = Payload.playerErrorEvent(Player.this.exoPlayer, error, null);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.ERROR, payload, true);
         }
 
@@ -51,7 +54,7 @@ public class Player {
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-            JSONObject payload = Payload.stateChangedEvent(Player.this.exoPlayer, playbackState);
+            JSONObject payload = Payload.stateEvent(Player.this.exoPlayer, playbackState);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
         }
 
@@ -119,7 +122,7 @@ public class Player {
         FrameLayout mainLayout = LayoutProvider.getMainLayout(this.activity);
         exoView = LayoutProvider.getExoPlayer(this.activity, config);
         // Disable default controller since it's rather basic.
-        exoView.setUseController(false);
+        exoView.setUseController(config.isVisibleControls());
         mainLayout.addView(exoView);
         dialog.setContentView(mainLayout);
         dialog.show();
@@ -141,21 +144,25 @@ public class Player {
 
         exoPlayer = ExoPlayerFactory.newSimpleInstance(this.activity, trackSelector, loadControl);
         exoPlayer.addListener(playerEventListener);
-
         exoView.setPlayer(exoPlayer);
 
         MediaSource mediaSource = getMediaSource(uri, bandwidthMeter);
         if (mediaSource != null) {
-            long offset = config.getOffset();
-            if(offset > -1) {
-                exoPlayer.seekTo(offset);
-            }
+//            long offset = config.getOffset();
+//            if (offset > -1) {
+//                exoPlayer.seekTo(offset);
+//            }
             exoPlayer.prepare(mediaSource);
             exoPlayer.setPlayWhenReady(true);
             JSONObject payload = Payload.startEvent(exoPlayer);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
         }
-        // TODO Exception?
+        else {
+            String msg = "Failed to construct mediaSource for " + uri;
+            Log.e(TAG, msg);
+            JSONObject payload = Payload.playerErrorEvent(Player.this.exoPlayer, null, msg);
+            new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.ERROR, payload, true);
+        }
     }
 
     private MediaSource getMediaSource(Uri uri, DefaultBandwidthMeter bandwidthMeter) {
@@ -205,12 +212,14 @@ public class Player {
         exoPlayer.setPlayWhenReady(false);
     }
 
-    public void seekTo(int timeMillis) {
+    public void seekTo(long timeMillis) {
         long seekPosition = exoPlayer.getDuration() == 0 ? 0 : Math.min(Math.max(0, timeMillis), exoPlayer.getDuration());
         exoPlayer.seekTo(seekPosition);
+        JSONObject payload = Payload.seekEvent(Player.this.exoPlayer, timeMillis);
+        new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
     }
 
     public JSONObject getPlayerState() {
-        return Payload.stateEvent(exoPlayer);
+        return Payload.stateEvent(exoPlayer, exoPlayer.getPlaybackState());
     }
 }
