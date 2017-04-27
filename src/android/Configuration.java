@@ -32,7 +32,7 @@ public class Configuration {
     }
 
     public long getOffset() {
-        return this.config.optLong("offset", -1);
+        return config.optLong("offset", -1);
     }
 
     public boolean isVisibleControls() {

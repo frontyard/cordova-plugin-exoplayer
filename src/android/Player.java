@@ -148,10 +148,10 @@ public class Player {
 
         MediaSource mediaSource = getMediaSource(uri, bandwidthMeter);
         if (mediaSource != null) {
-//            long offset = config.getOffset();
-//            if (offset > -1) {
-//                exoPlayer.seekTo(offset);
-//            }
+            long offset = config.getOffset();
+            if (offset > -1) {
+                exoPlayer.seekTo(offset);
+            }
             exoPlayer.prepare(mediaSource);
             exoPlayer.setPlayWhenReady(true);
             JSONObject payload = Payload.startEvent(exoPlayer);
