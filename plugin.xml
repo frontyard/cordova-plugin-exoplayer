@@ -18,11 +18,47 @@
     <platform name="android">
         <framework src="com.google.android.exoplayer:exoplayer:r2.4.0"/>
         <framework src="com.squareup.picasso:picasso:2.5.2"/>
+
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="ExoPlayer">
                 <param name="android-package" value="co.frontyard.cordova.plugin.exoplayer.Plugin"/>
             </feature>
         </config-file>
+
+        <source-file src="src/res/values/ids.xml" target-dir="res/values/"/>
+        <source-file src="src/res/layout/exo_simple_player_view.xml" target-dir="res/layout/"/>
+        <source-file src="src/res/layout/exo_playback_control_view.xml" target-dir="res/layout/"/>
+
+        <source-file src="src/res/drawable-ldpi/exo_controls_rewind.png" target-dir="res/drawable-ldpi/"/>
+        <source-file src="src/res/drawable-ldpi/exo_controls_play.png" target-dir="res/drawable-ldpi/"/>
+        <source-file src="src/res/drawable-ldpi/exo_controls_pause.png" target-dir="res/drawable-ldpi/"/>
+        <source-file src="src/res/drawable-ldpi/exo_controls_fastforward.png" target-dir="res/drawable-ldpi/"/>
+
+        <source-file src="src/res/drawable-mdpi/exo_controls_rewind.png" target-dir="res/drawable-mdpi/"/>
+        <source-file src="src/res/drawable-mdpi/exo_controls_play.png" target-dir="res/drawable-mdpi/"/>
+        <source-file src="src/res/drawable-mdpi/exo_controls_pause.png" target-dir="res/drawable-mdpi/"/>
+        <source-file src="src/res/drawable-mdpi/exo_controls_fastforward.png" target-dir="res/drawable-mdpi/"/>
+
+        <source-file src="src/res/drawable-hdpi/exo_controls_rewind.png" target-dir="res/drawable-hdpi/"/>
+        <source-file src="src/res/drawable-hdpi/exo_controls_play.png" target-dir="res/drawable-hdpi/"/>
+        <source-file src="src/res/drawable-hdpi/exo_controls_pause.png" target-dir="res/drawable-hdpi/"/>
+        <source-file src="src/res/drawable-hdpi/exo_controls_fastforward.png" target-dir="res/drawable-hdpi/"/>
+
+        <source-file src="src/res/drawable-xhdpi/exo_controls_rewind.png" target-dir="res/drawable-xhdpi/"/>
+        <source-file src="src/res/drawable-xhdpi/exo_controls_play.png" target-dir="res/drawable-xhdpi/"/>
+        <source-file src="src/res/drawable-xhdpi/exo_controls_pause.png" target-dir="res/drawable-xhdpi/"/>
+        <source-file src="src/res/drawable-xhdpi/exo_controls_fastforward.png" target-dir="res/drawable-xhdpi/"/>
+
+        <source-file src="src/res/drawable-xxhdpi/exo_controls_rewind.png" target-dir="res/drawable-xxhdpi/"/>
+        <source-file src="src/res/drawable-xxhdpi/exo_controls_play.png" target-dir="res/drawable-xxhdpi/"/>
+        <source-file src="src/res/drawable-xxhdpi/exo_controls_pause.png" target-dir="res/drawable-xxhdpi/"/>
+        <source-file src="src/res/drawable-xxhdpi/exo_controls_fastforward.png" target-dir="res/drawable-xxhdpi/"/>
+
+        <source-file src="src/res/drawable-xxxhdpi/exo_controls_rewind.png" target-dir="res/drawable-xxxhdpi/"/>
+        <source-file src="src/res/drawable-xxxhdpi/exo_controls_play.png" target-dir="res/drawable-xxxhdpi/"/>
+        <source-file src="src/res/drawable-xxxhdpi/exo_controls_pause.png" target-dir="res/drawable-xxxhdpi/"/>
+        <source-file src="src/res/drawable-xxxhdpi/exo_controls_fastforward.png" target-dir="res/drawable-xxxhdpi/"/>
+
         <source-file src="src/android/CallbackResponse.java" target-dir="src/co/frontyard/cordova/plugin/exoplayer/"/>
         <source-file src="src/android/Configuration.java" target-dir="src/co/frontyard/cordova/plugin/exoplayer/"/>
         <source-file src="src/android/LayoutProvider.java" target-dir="src/co/frontyard/cordova/plugin/exoplayer/"/>

@@ -8,6 +8,7 @@ import android.view.*;
 import android.widget.*;
 import com.google.android.exoplayer2.ui.*;
 import org.json.*;
+import com.squareup.picasso.*;
 
 public class LayoutProvider {
 
@@ -25,6 +26,26 @@ public class LayoutProvider {
         if (config.isAspectRatioFillScreen()) {
             view.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
         }
+        view.setUseController(config.isVisibleControls());
+        view.setFastForwardIncrementMs(config.getSkipTimeMs());
+        view.setRewindIncrementMs(config.getSkipTimeMs());
+        view.setShowMultiWindowTimeBar(true);
+        view.setControllerHideOnTouch(true);
+        view.setControllerShowTimeoutMs(config.getHideTimeout());
+
+        //ImageButton playButton = (ImageButton) activity.findViewById(/*com.google.android.exoplayer2.*/R.id.exo_play);
+        //ImageView playButton = (ImageView)activity.findViewById(R.id.exo_play);
+        //playButton.setImageResource(R.drawable.ic_play);
+        //Picasso.with(imageButton.getContext()).load("http://icons.iconarchive.com/icons/icons-land/play-stop-pause/256/Play-Normal-icon.png").into(imageButton);
+
+//        String artwork = config.getArtwork();
+//        if (null != artwork) {
+////            ImageView imageView = (ImageView) LayoutInflater.from(activity).inflate(com.google.android.exoplayer2.ui.R.id.exo_artwork, null);
+//            ImageView imageView = (ImageView) activity.findViewById(com.google.android.exoplayer2.R.id.exo_artwork);
+//            if (null != imageView) {
+//                Picasso.with(imageView.getContext()).load(artwork).into(imageView);
+//            }
+//        }
 
         return view;
     }

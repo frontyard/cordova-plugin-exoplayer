@@ -90,6 +90,19 @@ public class Plugin extends CordovaPlugin {
                 });
                 return true;
             }
+            else if (action.equals("setStreamTitle")) {
+                if (this.player == null) {
+                    return false;
+                }
+                final String title = data.optString(0, "");
+                cordova.getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        Plugin.this.player.setStreamTitle(title);
+                        new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, false);
+                    }
+                });
+                return true;
+            }
             else if (action.equals("close")) {
                 if (this.player != null) {
                     this.player.close();
