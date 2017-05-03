@@ -28,10 +28,11 @@ public class Plugin extends CordovaPlugin {
                 if (this.player == null) {
                     return false;
                 }
-                final String url = data.optString(0, "");
+                final String url = data.optString(0, null);
+                final JSONObject controller = data.optJSONObject(1);
                 cordova.getActivity().runOnUiThread(new Runnable() {
                     public void run() {
-                        Plugin.this.player.setStream(Uri.parse(url));
+                        Plugin.this.player.setStream(Uri.parse(url), controller);
                     }
                 });
 
@@ -86,19 +87,6 @@ public class Plugin extends CordovaPlugin {
                     public void run() {
                         JSONObject response = Plugin.this.player.getPlayerState();
                         new CallbackResponse(callbackContext).send(PluginResult.Status.OK, response, false);
-                    }
-                });
-                return true;
-            }
-            else if (action.equals("setStreamTitle")) {
-                if (this.player == null) {
-                    return false;
-                }
-                final String title = data.optString(0, "");
-                cordova.getActivity().runOnUiThread(new Runnable() {
-                    public void run() {
-                        Plugin.this.player.setStreamTitle(title);
-                        new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, false);
                     }
                 });
                 return true;

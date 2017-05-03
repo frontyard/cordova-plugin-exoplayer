@@ -33,8 +33,7 @@ public class Payload {
     public static JSONObject startEvent(ExoPlayer player) {
         Map<String, String> map = new HashMap<String, String>();
         map.put("eventType", "START_EVENT");
-        map.put("playWhenReady", Boolean.toString(player.getPlayWhenReady()));
-        map.put("playbackState", playbackStateToString(player.getPlaybackState()));
+        addPlayerState(map, player);
         return new JSONObject(map);
     }
 
@@ -67,46 +66,32 @@ public class Payload {
         Map<String, String> map = new HashMap<String, String>();
         map.put("eventType", "LOADING_EVENT");
         map.put("loading", Boolean.toString(loading));
-        map.put("playWhenReady", Boolean.toString(player.getPlayWhenReady()));
-        map.put("playbackState", playbackStateToString(player.getPlaybackState()));
-        map.put("bufferPercentage", Integer.toString(player.getBufferedPercentage()));
+        addPlayerState(map, player);
         return new JSONObject(map);
     }
 
     public static JSONObject stateEvent(ExoPlayer player, int playbackState) {
         Map<String, String> map = new HashMap<String, String>();
         map.put("eventType", "STATE_CHANGED_EVENT");
-        map.put("duration", Long.toString(player.getDuration()));
-        map.put("position", Long.toString(player.getCurrentPosition()));
-        map.put("playWhenReady", Boolean.toString(player.getPlayWhenReady()));
+        addPlayerState(map, player);
         map.put("playbackState", playbackStateToString(playbackState));
-        map.put("bufferPercentage", Integer.toString(player.getBufferedPercentage()));
         return new JSONObject(map);
     }
 
     public static JSONObject positionDiscontinuityEvent(ExoPlayer player) {
         Map<String, String> map = new HashMap<String, String>();
         map.put("eventType", "POSITION_DISCONTINUITY_EVENT");
-        map.put("duration", Long.toString(player.getDuration()));
-        map.put("position", Long.toString(player.getCurrentPosition()));
-        map.put("playWhenReady", Boolean.toString(player.getPlayWhenReady()));
-        map.put("playbackState", playbackStateToString(player.getPlaybackState()));
-        map.put("bufferPercentage", Integer.toString(player.getBufferedPercentage()));
+        addPlayerState(map, player);
         return new JSONObject(map);
     }
 
     public static JSONObject seekEvent(ExoPlayer player, long offset) {
         Map<String, String> map = new HashMap<String, String>();
         map.put("eventType", "SEEK_EVENT");
-        map.put("duration", Long.toString(player.getDuration()));
-        map.put("position", Long.toString(player.getCurrentPosition()));
         map.put("offset", Long.toString(offset));
-        map.put("playWhenReady", Boolean.toString(player.getPlayWhenReady()));
-        map.put("playbackState", playbackStateToString(player.getPlaybackState()));
-        map.put("bufferPercentage", Integer.toString(player.getBufferedPercentage()));
+        addPlayerState(map, player);
         return new JSONObject(map);
     }
-
 
     public static JSONObject playerErrorEvent(ExoPlayer player, ExoPlaybackException origin, String message) {
         int type = 0;
@@ -153,5 +138,15 @@ public class Payload {
         }
 
         return new JSONObject(map);
+    }
+
+    private static void addPlayerState(Map<String, String> map, ExoPlayer player) {
+        if (null != player) {
+            map.put("duration", Long.toString(player.getDuration()));
+            map.put("position", Long.toString(player.getCurrentPosition()));
+            map.put("playWhenReady", Boolean.toString(player.getPlayWhenReady()));
+            map.put("playbackState", playbackStateToString(player.getPlaybackState()));
+            map.put("bufferPercentage", Integer.toString(player.getBufferedPercentage()));
+        }
     }
 }

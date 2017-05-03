@@ -31,7 +31,6 @@ public class Player {
     private SimpleExoPlayer exoPlayer;
     private SimpleExoPlayerView exoView;
     private CordovaWebView webView;
-    private TextView infoTitleView;
 
     public Player(Configuration config, Activity activity, CallbackContext callbackContext, CordovaWebView webView) {
         this.config = config;
@@ -97,6 +96,7 @@ public class Player {
         @Override
         public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
             //exoView.dispatchMediaKeyEvent(event);
+            exoView.showController();
             JSONObject payload = Payload.keyEvent(event);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
             return true;
@@ -108,6 +108,7 @@ public class Player {
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
+            exoView.showController();
             int eventAction = event.getAction();
             if (previousAction != eventAction) {
                 previousAction = eventAction;
@@ -131,38 +132,13 @@ public class Player {
         mainLayout.addView(exoView);
         dialog.setContentView(mainLayout);
         dialog.show();
-        afterDialogIsShown();
-        int infoTitleViewId = activity.getResources().getIdentifier("exo_info_title", "TextView", activity.getPackageName());
-        infoTitleView = (TextView) activity.findViewById(infoTitleViewId);
-    }
 
-    private void afterDialogIsShown() {
         dialog.getWindow().setAttributes(LayoutProvider.getDialogLayoutParams(activity, config, dialog));
         exoView.requestFocus();
         exoView.setOnTouchListener(onTouchListener);
         preparePlayer(config.getUri());
-    }
 
-    public void setStreamTitle(String title) {
-//        int id = activity.getResources().getIdentifier("exo_info_title", "id", activity.getPackageName());
-//        Log.i(TAG, "InfoTitleView id=" + id);
-//        //TextView infoTitleView = activity.findViewById(R.id.exo_info_title);
-//        TextView infoTitleView = (TextView) activity.findViewById(id);
-//        if(null != infoTitleView) {
-//            infoTitleView.setText(title);
-//        }
-//        else {
-//            Log.e(TAG, "TextView not found");
-//        }
-
-        //TextView infoTitleView = (TextView) = activity.getResources().getIdentifier("exo_info_title", "TextView", activity.getPackageName());
-        if (null != infoTitleView) {
-            //TextView infoTitleView = (TextView) activity.findViewById(com.google.android.exoplayer2.R.id.exo_info_title);
-            infoTitleView.setText("### COOL:" + title);
-        }
-        else {
-            Log.w(TAG, "infoTitleView not found");
-        }
+        LayoutProvider.setupController(exoView, activity, config.getController());
     }
 
     private void preparePlayer(Uri uri) {
@@ -177,7 +153,7 @@ public class Player {
 
         MediaSource mediaSource = getMediaSource(uri, bandwidthMeter);
         if (mediaSource != null) {
-            long offset = config.getOffset();
+            long offset = config.getPlayOffset();
             if (offset > -1) {
                 exoPlayer.seekTo(offset);
             }
@@ -187,10 +163,7 @@ public class Player {
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
         }
         else {
-            String msg = "Failed to construct mediaSource for " + uri;
-            Log.e(TAG, msg);
-            JSONObject payload = Payload.playerErrorEvent(Player.this.exoPlayer, null, msg);
-            new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.ERROR, payload, true);
+            sendError("Failed to construct mediaSource for " + uri);
         }
     }
 
@@ -227,10 +200,13 @@ public class Player {
         }
     }
 
-    public void setStream(Uri uri) {
-        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-        MediaSource mediaSource = getMediaSource(uri, bandwidthMeter);
-        exoPlayer.prepare(mediaSource);
+    public void setStream(Uri uri, JSONObject controller) {
+        if (null != uri) {
+            DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+            MediaSource mediaSource = getMediaSource(uri, bandwidthMeter);
+            exoPlayer.prepare(mediaSource);
+        }
+        LayoutProvider.setupController(exoView, activity, controller);
     }
 
     public void play() {
@@ -250,5 +226,11 @@ public class Player {
 
     public JSONObject getPlayerState() {
         return Payload.stateEvent(exoPlayer, exoPlayer.getPlaybackState());
+    }
+
+    private void sendError(String msg) {
+        Log.e(TAG, msg);
+        JSONObject payload = Payload.playerErrorEvent(Player.this.exoPlayer, null, msg);
+        new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.ERROR, payload, true);
     }
 }
