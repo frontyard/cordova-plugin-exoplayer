@@ -7,6 +7,7 @@
              android:layoutDirection="ltr"
              android:orientation="vertical">
 
+    <!-- Control button bar -->
     <LinearLayout
         android:id="@id/exo_buttons"
         android:layout_width="match_parent"
@@ -72,6 +73,7 @@
                      style="@style/ExoMediaButton.Next"/-->
     </LinearLayout>
 
+    <!-- Buttom info bar -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -42,6 +42,8 @@ import com.google.android.exoplayer2.upstream.*;
 import com.google.android.exoplayer2.util.*;
 import com.squareup.picasso.*;
 import java.lang.*;
+import java.lang.Math;
+import java.lang.Override;
 import org.apache.cordova.*;
 import org.json.*;
 
@@ -54,6 +56,7 @@ public class Player {
     private SimpleExoPlayer exoPlayer;
     private SimpleExoPlayerView exoView;
     private CordovaWebView webView;
+    private int controllerVisibility;
 
     public Player(Configuration config, Activity activity, CallbackContext callbackContext, CordovaWebView webView) {
         this.config = config;
@@ -119,10 +122,26 @@ public class Player {
         @Override
         public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
             //exoView.dispatchMediaKeyEvent(event);
-            exoView.showController();
-            JSONObject payload = Payload.keyEvent(event);
-            new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
-            return true;
+            int action = event.getAction();
+            String key = KeyEvent.keyCodeToString(event.getKeyCode());
+            // We need adroid to handle these key events
+            if (key.equals("KEYCODE_VOLUME_UP") ||
+                    key.equals("KEYCODE_VOLUME_DOWN") ||
+                    key.equals("KEYCODE_VOLUME_MUTE") ||
+                    key.equals("KEYCODE_BACK")) {
+                return false;
+            }
+            else {
+//                if (Player.this.controllerVisibility == View.VISIBLE) {
+//                }
+                // Show controller on key press but not for certain keys.
+                if (action == KeyEvent.ACTION_UP && !key.equals("KEYCODE_BACK")) {
+                    exoView.showController();
+                }
+                JSONObject payload = Payload.keyEvent(event);
+                new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
+                return true;
+            }
         }
     };
 
@@ -152,6 +171,13 @@ public class Player {
 
         FrameLayout mainLayout = LayoutProvider.getMainLayout(this.activity);
         exoView = LayoutProvider.getExoPlayer(this.activity, config);
+        exoView.setControllerVisibilityListener(new PlaybackControlView.VisibilityListener() {
+            @Override
+            public void onVisibilityChange(int visibility) {
+                Player.this.controllerVisibility = visibility;
+            }
+        });
+
         mainLayout.addView(exoView);
         dialog.setContentView(mainLayout);
         dialog.show();

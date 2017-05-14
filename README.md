@@ -37,55 +37,71 @@ Plugin methods
     init(params),  // set player parameters
     show(successCallback, errorCallback) // show player and add main callbacks
     
-    setText("some text\nsome other text") // change header text on intialized player
-    setStream(url) // switch stream
+    setStream(url, controllerConfig) // switch stream
 
     play() 
     pause()
     seekTo(milliseconds)
 
-    videoProperties(success, error) // returns video information: {duration, current_position, is_playing}
+    getState(success, error) // returns player state
 
-    close() // --> close player
+    close() // --> close and dispose of player
 }
 ```
 
 Player parameters set on initialization
 ```js
 {
-    user_agent: "PluginExoPlayer", 
-    plugin_controls_visible: false, // exoplayer controls visibilty
-
-    header: {   // top header panel
-        height: 200, 
-        padding: 30, 
-        background_color: "#33F0F8FF",
-        image_url: "https://s-media-cache-ak0.pinimg.com/originals/77/7a/df/777adf082fc125aa9490a3450192ec6c.jpg",
-        text_color: "#BBFAA8EF",
-        text_align: "center", // left, center or right
-        text: "Lorem ipsum Ipsum\nlorem Lorem",
-        text_size: 20
-    },
-
-    url: "https://devimages.apple.com.edgekey.net/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8",
-    full_screen: false, 
-    aspect_ratio: "fill_screen" // fit_screen or fill_screen
-    raw_touch_events: false
+    url: 'https://devimages.apple.com.edgekey.net/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8',
+    userAgent: 'PluginExoPlayer',
+    aspectRatio: 'FILL_SCREEN' // default is FIT_SCREEN
+    hideTimeout: 5000, // Hide controls after this many milliseconds, default is 5sec
+    playOffset: 10 * 60 * 60 * 1000, // Start playback 10 minutes into video specified in milliseconds
+    skipTime: 60 * 1000, // Amount of time to use when going forward/backward, default is 1min
+    controller: { // If this object is not present controller will not be visible
+        streamImage: 'http://url.to/channel.png',
+        streamTitle: 'My channel',
+        streamDescription: '2nd line you can use to display whatever you want',
+        hideProgress: true,
+        controlIcons: {
+            'exo_rew': 'http://url.to/rew.png',
+            'exo_play': 'http://url.to/play.png',
+            'exo_pause': 'http://url.to/pause.png',
+            'exo_ffwd': 'http://url.to/ffwd.png'
+        }
+    }
 }
 ```
+Controller is composed of several pieces. To the left there is optional streamImage, followed by two lines, top and bottom. Top line is reserved for streamTitle, while bottom line can either be streamDescription or progress bar. If you provide streamDescription, progress bar will not be visible. Optionaly you can turn off progress bar by passing hideProgress: true if you don't want to show either.
+
+Playback control buttons are centered on the screen and use default ExoPlayer icons. Optionally you can override these by your own images via controlIcons object.
+
+Plugin will send following events back to Cordova app through successCallback specified through show function:
+```js
+START_EVENT
+STOP_EVENT
+KEY_EVENT
+TOUCH_EVENT
+LOADING_EVENT
+STATE_CHANGED_EVENT
+POSITION_DISCONTINUITY_EVENT
+SEEK_EVENT
+PLAYER_ERROR_EVENT
+```
+Each event will send JSON payload coresponding to that event. Some events (where appropriate) will also send additional information about playback like duration, postion, etc. 
 
 Example of a key events
 ```js
 {
-    "event_type":"key_event",
-    "event_action":"ACTION_DOWN",
-    "event_keycode":"KEYCODE_VOLUME_UP"
+    'eventType':'KEY_EVENT',
+    'eventAction':'ACTION_DOWN',
+    'eventKeycode':'KEYCODE_VOLUME_UP'
 }
 
 {   
-    "event_type":"key_event",
-    "event_action":"ACTION_UP",
-    "event_keycode":"KEYCODE_VOLUME_UP"
+    'eventType':'KEY_EVENT',
+    'eventAction':'ACTION_UP',
+    'eventKeycode':'KEYCODE_VOLUME_UP'
 }
 ```
 
@@ -93,23 +109,23 @@ Example of a key events
 Example of a raw_touch_events
 ```js
 {
-    "event_type":"touch_event",
-    "event_action":"ACTION_DOWN",
-    "event_axis_x":543,
-    "event_axis_y":1321.8009033203125
+    'eventType':'TOUCH_EVENT',
+    'eventAction':'ACTION_DOWN',
+    'eventAxisX':543,
+    'eventAxisY':1321.8009033203125
 }
 
-{   "event_type":"touch_event",
-    "event_action":"ACTION_MOVE",
-    "event_axis_x":543,
-    "event_axis_y":1320.5
+{   'eventType':'TOUCH_EVENT',
+    'eventAction':'ACTION_MOVE',
+    'eventAxisX':543,
+    'eventAxisY':1320.5
 }
 
 {
-    "event_type":"touch_event",
-    "event_action":"ACTION_UP",
-    "event_axis_x":543,
-    "event_axis_y":1320.5
+    'eventType':'TOUCH_EVENT',
+    'eventAction':'ACTION_UP',
+    'eventAxisX':543,
+    'eventAxisY':1320.5
 }
 ```
 

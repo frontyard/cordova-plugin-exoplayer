@@ -31,14 +31,14 @@ module.exports = {
             play: function (successCallback, errorCallback) {
                 cordova.exec(successCallback, errorCallback, "ExoPlayer", "play", []);
             },
-            setStream: function (url, controller, successCallback, errorCallback) {
-                cordova.exec(successCallback, errorCallback, "ExoPlayer", "setStream", [url, controller]);
-            },
             pause: function (successCallback, errorCallback) {
                 cordova.exec(successCallback, errorCallback, "ExoPlayer", "pause", []);
             },
             seekTo: function (milliseconds, successCallback, errorCallback) {
                 cordova.exec(successCallback, errorCallback, "ExoPlayer", "seekTo", [milliseconds]);
+            },
+            setStream: function (url, controller, successCallback, errorCallback) {
+                cordova.exec(successCallback, errorCallback, "ExoPlayer", "setStream", [url, controller]);
             },
             getState: function (successCallback, errorCallback) {
                 cordova.exec(successCallback, errorCallback, "ExoPlayer", "getState", []);

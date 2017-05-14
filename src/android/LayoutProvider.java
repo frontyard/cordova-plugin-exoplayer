@@ -76,7 +76,7 @@ public class LayoutProvider {
 
     private static void setupButtons(SimpleExoPlayerView parentView, Activity activity, JSONObject controller) {
         java.lang.String packageName = activity.getPackageName();
-        JSONObject buttonsConfig = controller.optJSONObject("buttons");
+        JSONObject buttonsConfig = controller.optJSONObject("controlIcons");
         if (null != buttonsConfig) {
             for (BUTTON b : BUTTON.values()) {
                 String buttonName = b.name();
@@ -107,7 +107,7 @@ public class LayoutProvider {
 
     private static void setupBar(SimpleExoPlayerView parentView, Activity activity, JSONObject controller) {
         String streamTitle = controller.optString("streamTitle", null);
-        String streamSubtitle = controller.optString("streamSubtitle", null);
+        String streamDescription = controller.optString("streamDescription", null);
         String streamImage = controller.optString("streamImage", null);
         boolean hideProgress = controller.optBoolean("hideProgress");
 
@@ -122,13 +122,13 @@ public class LayoutProvider {
         if(null != streamTitle) {
             titleView.setText(streamTitle);
         }
-        if (null != streamSubtitle && !streamSubtitle.equals("null")) { // TODO: Why are we getting string "null" here?
+        if (null != streamDescription && !streamDescription.equals("null")) { // TODO: Why are we getting string "null" here?
             timebarView.setVisibility(View.GONE);
-            subtitleView.setText(streamSubtitle);
+            subtitleView.setText(streamDescription);
         }
         else if (hideProgress) {
             timebarView.setVisibility(View.GONE);
-            subtitleView.setText(streamSubtitle);
+            subtitleView.setText(streamDescription);
         }
         else {
             subtitleView.setVisibility(View.GONE);

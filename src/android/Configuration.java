@@ -56,10 +56,6 @@ public class Configuration {
         return config.optLong("playOffset", -1);
     }
 
-    public boolean isVisibleControls() {
-        return config.optBoolean("controlsVisible", true);
-    }
-
     public final JSONObject getController() {
         return config.optJSONObject("controller");
     }
