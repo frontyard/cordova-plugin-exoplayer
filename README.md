@@ -1,6 +1,6 @@
 # Cordova ExoPlayer Plugin
 
-Currently supporting DASH and HLS and has an optional stylable header.
+Cordova media player plugin using Google's ExoPlayer framework.
 
 ## Using
 
@@ -11,7 +11,7 @@ Create a new Cordova Project
 Install the plugin
 
     $ cd hello
-    $ cordova plugin add https://github.com/frontyard/cordova-exoplayer-plugin
+    $ cordova plugin add cordova-plugin-exoplayer
     
 
 Edit `www/js/index.js` and add the following code inside `onDeviceReady`
@@ -37,13 +37,13 @@ Plugin methods
     init(params),  // set player parameters
     show(successCallback, errorCallback) // show player and add main callbacks
     
-    setStream(url, controllerConfig) // switch stream
+    setStream(url, controllerConfig) // switch stream without disposing of player. controllerConfig is "config" part of the inital parameters. 
 
     play() 
     pause()
     seekTo(milliseconds)
 
-    getState(success, error) // returns player state
+    getState(successCallback, errorCallback) // returns player state
 
     close() // --> close and dispose of player
 }
