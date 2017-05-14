@@ -97,12 +97,12 @@ public class Player {
 
         @Override
         public void onTimelineChanged(Timeline timeline, Object manifest) {
-            // TODO Maybe?
+            // Need to see if we want to send this to Cordova.
         }
 
         @Override
         public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-            // TODO Maybe?
+            // Need to see if we want to send this to Cordova.
         }
     };
 
