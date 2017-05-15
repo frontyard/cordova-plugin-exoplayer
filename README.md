@@ -39,7 +39,7 @@ Plugin methods
     init(params),  // set player parameters
     show(successCallback, errorCallback) // show player and add main callbacks
     
-    setStream(url, controllerConfig) // switch stream without disposing of player. controllerConfig is "config" part of the inital parameters. 
+    setStream(url, controllerConfig) // switch stream without disposing of player. controllerConfig is "controller" part of the inital parameters. 
 
     play() 
     pause()
@@ -98,7 +98,7 @@ PLAYER_ERROR_EVENT
 ```
 Each event will send JSON payload coresponding to that event. Some events (where appropriate) will also send additional information about playback like duration, postion, etc. 
 
-Example of a key events
+Example of key events:
 ```js
 {
     'eventType':'KEY_EVENT',
@@ -114,7 +114,7 @@ Example of a key events
 ```
 
 
-Example of a raw_touch_events
+Example of touch events:
 ```js
 {
     'eventType':'TOUCH_EVENT',
