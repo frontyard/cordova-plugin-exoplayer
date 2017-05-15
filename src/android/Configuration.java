@@ -45,7 +45,7 @@ public class Configuration {
     }
 
     public String getUserAgent() {
-        return this.config.optString("userAgent", "ExoPlayer");
+        return this.config.optString("userAgent", "ExoPlayerPlugin");
     }
 
     public boolean isAspectRatioFillScreen() {

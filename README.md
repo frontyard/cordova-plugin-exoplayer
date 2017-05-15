@@ -36,7 +36,7 @@ Edit `www/js/index.js` and add the following code inside `onDeviceReady`
 Plugin methods
 ```js
 {
-    init(params),  // set player parameters
+    init(params)  // set player parameters
     show(successCallback, errorCallback) // show player and add main callbacks
     
     setStream(url, controllerConfig) // switch stream without disposing of player. controllerConfig is "controller" part of the inital parameters. 
@@ -51,14 +51,14 @@ Plugin methods
 }
 ```
 
-Player parameters set on initialization
+This is what `params` look like for `init` call, most of them are optional: 
 ```js
 {
     url: 'https://devimages.apple.com.edgekey.net/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8',
-    userAgent: 'PluginExoPlayer',
+    userAgent: 'MyAwesomePlayer', // default is 'ExoPlayerPlugin'
     aspectRatio: 'FILL_SCREEN' // default is FIT_SCREEN
     hideTimeout: 5000, // Hide controls after this many milliseconds, default is 5sec
-    playOffset: 10 * 60 * 60 * 1000, // Start playback 10 minutes into video specified in milliseconds
+    playOffset: 10 * 60 * 60 * 1000, // Start playback 10 minutes into video specified in milliseconds, default is 0
     skipTime: 60 * 1000, // Amount of time to use when going forward/backward, default is 1min
     audioOnly: true // Only play audio in the backgroud, default is false.
     subtitleUrl: 'http://url.to/subtitle.srt', // Optional subtitle url
