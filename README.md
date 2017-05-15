@@ -60,6 +60,8 @@ Player parameters set on initialization
     hideTimeout: 5000, // Hide controls after this many milliseconds, default is 5sec
     playOffset: 10 * 60 * 60 * 1000, // Start playback 10 minutes into video specified in milliseconds
     skipTime: 60 * 1000, // Amount of time to use when going forward/backward, default is 1min
+    audioOnly: true // Only play audio in the backgroud, default is false.
+    subtitleUrl: 'http://url.to/subtitle.srt', // Optional subtitle url
     controller: { // If this object is not present controller will not be visible
         streamImage: 'http://url.to/channel.png',
         streamTitle: 'My channel',
@@ -78,6 +80,10 @@ Controller is composed of several pieces. To the left there is optional streamIm
 
 Playback control buttons are centered on the screen and use default ExoPlayer icons. Optionally you can override these by your own images via controlIcons object.
 
+You can pass `subtitleUrl` for subtitle to be shown over the video. We currently support .srt and .vtt subtitle formats. Subtitles are not supported on all stream types, as ExoPlayer has requirement that both video and subtitle "must have the same number of periods, and must not have any dynamic windows", which means for simple mp4s it should work, but on more complex HLS/Dash setups it might not. 
+
+If you pass in `audioOnly: true`, make sure to manually close the player on some event (like escape button) since the plugin won't be detecting keypresses when playing audio in the background.
+ 
 Plugin will send following events back to Cordova app through successCallback specified through show function:
 ```js
 START_EVENT

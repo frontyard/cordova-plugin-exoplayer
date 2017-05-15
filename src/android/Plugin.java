@@ -41,7 +41,7 @@ public class Plugin extends CordovaPlugin {
                 this.player = new Player(new Configuration(data.getJSONObject(0)), cordova.getActivity(), callbackContext, webView);
                 cordova.getActivity().runOnUiThread(new Runnable() {
                     public void run() {
-                        Plugin.this.player.createDialog();
+                        Plugin.this.player.createPlayer();
                     }
                 });
                 new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);

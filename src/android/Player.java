@@ -121,7 +121,6 @@ public class Player {
     private DialogInterface.OnKeyListener onKeyListener = new DialogInterface.OnKeyListener() {
         @Override
         public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-            //exoView.dispatchMediaKeyEvent(event);
             int action = event.getAction();
             String key = KeyEvent.keyCodeToString(event.getKeyCode());
             // We need adroid to handle these key events
@@ -135,7 +134,7 @@ public class Player {
 //                if (Player.this.controllerVisibility == View.VISIBLE) {
 //                }
                 // Show controller on key press but not for certain keys.
-                if (action == KeyEvent.ACTION_UP && !key.equals("KEYCODE_BACK")) {
+                if (null != exoView && action == KeyEvent.ACTION_UP && !key.equals("KEYCODE_BACK")) {
                     exoView.showController();
                 }
                 JSONObject payload = Payload.keyEvent(event);
@@ -161,6 +160,20 @@ public class Player {
         }
     };
 
+    private PlaybackControlView.VisibilityListener playbackControlVisibilityListener = new PlaybackControlView.VisibilityListener() {
+        @Override
+        public void onVisibilityChange(int visibility) {
+            Player.this.controllerVisibility = visibility;
+        }
+    };
+
+    public void createPlayer() {
+        if (!config.isAudioOnly()) {
+            createDialog();
+        }
+        preparePlayer(config.getUri());
+    }
+
     public void createDialog() {
         dialog = new Dialog(this.activity, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
         dialog.setOnKeyListener(onKeyListener);
@@ -171,12 +184,7 @@ public class Player {
 
         FrameLayout mainLayout = LayoutProvider.getMainLayout(this.activity);
         exoView = LayoutProvider.getExoPlayer(this.activity, config);
-        exoView.setControllerVisibilityListener(new PlaybackControlView.VisibilityListener() {
-            @Override
-            public void onVisibilityChange(int visibility) {
-                Player.this.controllerVisibility = visibility;
-            }
-        });
+        exoView.setControllerVisibilityListener(playbackControlVisibilityListener);
 
         mainLayout.addView(exoView);
         dialog.setContentView(mainLayout);
@@ -185,8 +193,6 @@ public class Player {
         dialog.getWindow().setAttributes(LayoutProvider.getDialogLayoutParams(activity, config, dialog));
         exoView.requestFocus();
         exoView.setOnTouchListener(onTouchListener);
-        preparePlayer(config.getUri());
-
         LayoutProvider.setupController(exoView, activity, config.getController());
     }
 
@@ -198,7 +204,9 @@ public class Player {
 
         exoPlayer = ExoPlayerFactory.newSimpleInstance(this.activity, trackSelector, loadControl);
         exoPlayer.addListener(playerEventListener);
-        exoView.setPlayer(exoPlayer);
+        if (null != exoView) {
+            exoView.setPlayer(exoPlayer);
+        }
 
         MediaSource mediaSource = getMediaSource(uri, bandwidthMeter);
         if (mediaSource != null) {
@@ -219,31 +227,67 @@ public class Player {
     private MediaSource getMediaSource(Uri uri, DefaultBandwidthMeter bandwidthMeter) {
         String userAgent = Util.getUserAgent(this.activity, config.getUserAgent());
         Handler mainHandler = new Handler();
-        HttpDataSource.Factory httpDataSourceFactory = new DefaultHttpDataSourceFactory(userAgent, bandwidthMeter);
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this.activity, bandwidthMeter, httpDataSourceFactory);
+        int connectTimeout = 10 * 1000;
+        int readTimeout = 10 * 1000;
+        int retryCount = 10;
 
+        HttpDataSource.Factory httpDataSourceFactory = new DefaultHttpDataSourceFactory(userAgent, bandwidthMeter, connectTimeout, readTimeout, true);
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this.activity, bandwidthMeter, httpDataSourceFactory);
+        MediaSource mediaSource;
         int type = Util.inferContentType(uri);
         switch (type) {
             case C.TYPE_DASH:
+                long livePresentationDelayMs = DashMediaSource.DEFAULT_LIVE_PRESENTATION_DELAY_PREFER_MANIFEST_MS;
                 DefaultDashChunkSource.Factory dashChunkSourceFactory = new DefaultDashChunkSource.Factory(dataSourceFactory);
-                return new DashMediaSource(uri, new DefaultDataSourceFactory(this.activity, null, new DefaultHttpDataSourceFactory(userAgent, null)),
-                        dashChunkSourceFactory, mainHandler, null);
+                // Last param is AdaptiveMediaSourceEventListener
+                mediaSource = new DashMediaSource(uri, dataSourceFactory, dashChunkSourceFactory, retryCount, livePresentationDelayMs, mainHandler, null);
+                break;
             case C.TYPE_HLS:
-                return new HlsMediaSource(uri, dataSourceFactory, mainHandler, null);
+                // Last param is AdaptiveMediaSourceEventListener
+                mediaSource = new HlsMediaSource(uri, dataSourceFactory, retryCount, mainHandler, null);
+                break;
             case C.TYPE_SS:
                 DefaultSsChunkSource.Factory ssChunkSourceFactory = new DefaultSsChunkSource.Factory(dataSourceFactory);
-                return new SsMediaSource(uri, dataSourceFactory, ssChunkSourceFactory, mainHandler, null);
+                // Last param is AdaptiveMediaSourceEventListener
+                mediaSource = new SsMediaSource(uri, dataSourceFactory, ssChunkSourceFactory, mainHandler, null);
+                break;
             default:
                 ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-                return new ExtractorMediaSource(uri, dataSourceFactory, extractorsFactory, mainHandler, null);
+                mediaSource = new ExtractorMediaSource(uri, dataSourceFactory, extractorsFactory, mainHandler, null);
+                break;
+        }
+
+        String subtitleUrl = config.getSubtitleUrl();
+        if (null != subtitleUrl) {
+            Uri subtitleUri = Uri.parse(subtitleUrl);
+            String subtitleType = inferSubtitleType(subtitleUri);
+            Log.i(TAG, "Subtitle present: " + subtitleUri + ", type=" + subtitleType);
+            Format textFormat = Format.createTextSampleFormat(null, subtitleType, null, Format.NO_VALUE, Format.NO_VALUE, "en", null);
+            MediaSource subtitleSource = new SingleSampleMediaSource(subtitleUri, httpDataSourceFactory, textFormat, C.TIME_UNSET);
+            return new MergingMediaSource(mediaSource, subtitleSource);
+        }
+        else {
+            return mediaSource;
+        }
+    }
+
+    private static String inferSubtitleType(Uri uri) {
+        String fileName = uri.getPath().toLowerCase();
+
+        if (fileName.endsWith(".vtt")) {
+            return MimeTypes.TEXT_VTT;
+        }
+        else {
+            // Assume it's srt.
+            return MimeTypes.APPLICATION_SUBRIP;
         }
     }
 
     public void close() {
         if (exoPlayer != null) {
             exoPlayer.release();
+            exoPlayer = null;
         }
-        exoPlayer = null;
         if (this.dialog != null) {
             dialog.dismiss();
         }
@@ -255,7 +299,9 @@ public class Player {
             MediaSource mediaSource = getMediaSource(uri, bandwidthMeter);
             exoPlayer.prepare(mediaSource);
         }
-        LayoutProvider.setupController(exoView, activity, controller);
+        if (null != exoView) {
+            LayoutProvider.setupController(exoView, activity, controller);
+        }
     }
 
     public void play() {
