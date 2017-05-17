@@ -22,6 +22,7 @@
                      android:layout_gravity="center"
                      android:adjustViewBounds="true"
                      android:scaleType="centerInside"
+                     android:background="#00000000"
                      style="@style/ExoMediaButton.Previous"/-->
 
         <ImageButton android:id="@id/exo_rew"
@@ -32,6 +33,7 @@
                      android:layout_gravity="center"
                      android:adjustViewBounds="true"
                      android:scaleType="centerInside"
+                     android:background="#00000000"
                      style="@style/ExoMediaButton.Rewind"/>
 
         <ImageButton android:id="@id/exo_play"
@@ -42,6 +44,7 @@
                      android:layout_gravity="center"
                      android:adjustViewBounds="true"
                      android:scaleType="centerInside"
+                     android:background="#00000000"
                      style="@style/ExoMediaButton.Play"/>
 
         <ImageButton android:id="@id/exo_pause"
@@ -52,6 +55,7 @@
                      android:layout_gravity="center"
                      android:adjustViewBounds="true"
                      android:scaleType="centerInside"
+                     android:background="#00000000"
                      style="@style/ExoMediaButton.Pause"/>
 
         <ImageButton android:id="@id/exo_ffwd"
@@ -62,6 +66,7 @@
                      android:layout_gravity="center"
                      android:adjustViewBounds="true"
                      android:scaleType="centerInside"
+                     android:background="#00000000"
                      style="@style/ExoMediaButton.FastForward"/>
 
         <!--ImageButton android:id="@id/exo_next"
@@ -70,6 +75,7 @@
                      android:layout_gravity="center"
                      android:adjustViewBounds="true"
                      android:scaleType="centerInside"
+                     android:background="#00000000"
                      style="@style/ExoMediaButton.Next"/-->
     </LinearLayout>
 

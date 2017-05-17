@@ -4,6 +4,8 @@
 
 Cordova media player plugin using Google's ExoPlayer framework.
 
+Please send us links to your cool projects made with this plugin so we can include them on this page!
+
 ## Using
 
 Create a new Cordova Project
@@ -56,11 +58,11 @@ This is what `params` look like for `init` call, most of them are optional:
 {
     url: 'https://devimages.apple.com.edgekey.net/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8',
     userAgent: 'MyAwesomePlayer', // default is 'ExoPlayerPlugin'
-    aspectRatio: 'FILL_SCREEN' // default is FIT_SCREEN
+    aspectRatio: 'FILL_SCREEN', // default is FIT_SCREEN
     hideTimeout: 5000, // Hide controls after this many milliseconds, default is 5sec
     playOffset: 10 * 60 * 60 * 1000, // Start playback 10 minutes into video specified in milliseconds, default is 0
     skipTime: 60 * 1000, // Amount of time to use when going forward/backward, default is 1min
-    audioOnly: true // Only play audio in the backgroud, default is false.
+    audioOnly: true, // Only play audio in the backgroud, default is false.
     subtitleUrl: 'http://url.to/subtitle.srt', // Optional subtitle url
     controller: { // If this object is not present controller will not be visible
         streamImage: 'http://url.to/channel.png',
@@ -150,3 +152,7 @@ Run the code
 For more information on setting up Cordova see [the documentation](http://cordova.apache.org/docs/en/latest/guide/cli/index.html)
 
 For more info on plugins see the [Plugin Development Guide](http://cordova.apache.org/docs/en/latest/guide/hybrid/plugins/index.html)
+
+General ExoPlayer [documentation](https://google.github.io/ExoPlayer/)
+
+ExoPlayer [source code](https://github.com/google/ExoPlayer)
