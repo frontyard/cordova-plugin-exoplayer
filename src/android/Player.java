@@ -179,6 +179,9 @@ public class Player {
         dialog.setOnKeyListener(onKeyListener);
         dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        View decorView = dialog.getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
         dialog.setCancelable(true);
         dialog.setOnDismissListener(dismissListener);
 
