@@ -32,81 +32,85 @@ public class Plugin extends CordovaPlugin {
     private Player player;
 
     @Override
-    public boolean execute(String action, JSONArray data, final CallbackContext callbackContext) throws JSONException {
+    public boolean execute(final String action, final JSONArray data, final CallbackContext callbackContext) throws JSONException {
         try {
+            final Plugin self = this;
             if (action.equals("show")) {
-                if (this.player != null) {
-                    this.player.close();
-                }
-                this.player = new Player(new Configuration(data.getJSONObject(0)), cordova.getActivity(), callbackContext, webView);
                 cordova.getActivity().runOnUiThread(new Runnable() {
                     public void run() {
-                        Plugin.this.player.createPlayer();
+                        if (self.player != null) {
+                            self.player.close();
+                        }
+                        JSONObject params = data.optJSONObject(0);
+                        self.player = new Player(new Configuration(params), cordova.getActivity(), callbackContext, webView);
+                        self.player.createPlayer();
+                        new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
                     }
                 });
-                new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
                 return true;
             }
             else if (action.equals("setStream")) {
-                if (this.player == null) {
+                if (self.player == null) {
                     return false;
                 }
                 final String url = data.optString(0, null);
                 final JSONObject controller = data.optJSONObject(1);
                 cordova.getActivity().runOnUiThread(new Runnable() {
                     public void run() {
-                        Plugin.this.player.setStream(Uri.parse(url), controller);
+                        self.player.setStream(Uri.parse(url), controller);
+                        new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
                     }
                 });
-
-                new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
                 return true;
             }
             else if (action.equals("playPause")) {
-                if (this.player == null) {
+                if (self.player == null) {
                     return false;
                 }
                 cordova.getActivity().runOnUiThread(new Runnable() {
                     public void run() {
-                        Plugin.this.player.playPause();
+                        self.player.playPause();
+                        new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
                     }
                 });
 
-                new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
                 return true;
             }
             else if (action.equals("seekTo")) {
-                if (this.player == null) {
+                if (self.player == null) {
                     return false;
                 }
                 final long seekTime = data.optLong(0, 0);
                 cordova.getActivity().runOnUiThread(new Runnable() {
                     public void run() {
-                        Plugin.this.player.seekTo(seekTime);
+                        self.player.seekTo(seekTime);
+                        new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
                     }
                 });
-
-                new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
                 return true;
             }
             else if (action.equals("getState")) {
-                if (this.player == null) {
+                if (self.player == null) {
                     return false;
                 }
                 cordova.getActivity().runOnUiThread(new Runnable() {
                     public void run() {
-                        JSONObject response = Plugin.this.player.getPlayerState();
+                        JSONObject response = self.player.getPlayerState();
                         new CallbackResponse(callbackContext).send(PluginResult.Status.OK, response, false);
                     }
                 });
                 return true;
             }
             else if (action.equals("close")) {
-                if (this.player != null) {
-                    this.player.close();
-                    new CallbackResponse(callbackContext).send(PluginResult.Status.OK, false);
+                if (self.player == null) {
+                    return false;
                 }
-                this.player = null;
+                cordova.getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        self.player.close();
+                        new CallbackResponse(callbackContext).send(PluginResult.Status.OK, false);
+                    }
+                });
                 return true;
             }
             else {
