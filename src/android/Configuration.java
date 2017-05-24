@@ -56,8 +56,8 @@ public class Configuration {
         return config.optBoolean("audioOnly");
     }
 
-    public long getPlayOffset() {
-        return config.optLong("playOffset", -1);
+    public long getSeekTo() {
+        return config.optLong("seekTo", -1);
     }
 
     public final JSONObject getController() {

@@ -57,6 +57,7 @@ public class Player {
     private SimpleExoPlayerView exoView;
     private CordovaWebView webView;
     private int controllerVisibility;
+    private boolean paused = false;
 
     public Player(Configuration config, Activity activity, CallbackContext callbackContext, CordovaWebView webView) {
         this.config = config;
@@ -218,7 +219,7 @@ public class Player {
 
         MediaSource mediaSource = getMediaSource(uri, bandwidthMeter);
         if (mediaSource != null) {
-            long offset = config.getPlayOffset();
+            long offset = config.getSeekTo();
             if (offset > -1) {
                 exoPlayer.seekTo(offset);
             }
@@ -312,12 +313,9 @@ public class Player {
         }
     }
 
-    public void play() {
-        exoPlayer.setPlayWhenReady(true);
-    }
-
-    public void pause() {
-        exoPlayer.setPlayWhenReady(false);
+    public void playPause() {
+        paused = !paused;
+        exoPlayer.setPlayWhenReady(!paused);
     }
 
     public void seekTo(long timeMillis) {

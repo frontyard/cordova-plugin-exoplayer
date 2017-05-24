@@ -62,26 +62,13 @@ public class Plugin extends CordovaPlugin {
                 new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
                 return true;
             }
-            else if (action.equals("play")) {
+            else if (action.equals("playPause")) {
                 if (this.player == null) {
                     return false;
                 }
                 cordova.getActivity().runOnUiThread(new Runnable() {
                     public void run() {
-                        Plugin.this.player.play();
-                    }
-                });
-
-                new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
-                return true;
-            }
-            else if (action.equals("pause")) {
-                if (this.player == null) {
-                    return false;
-                }
-                cordova.getActivity().runOnUiThread(new Runnable() {
-                    public void run() {
-                        Plugin.this.player.pause();
+                        Plugin.this.player.playPause();
                     }
                 });
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         id="cordova-plugin-exoplayer"
-        version="2.2.1">
+        version="2.3.0">
 
     <name>ExoPlayer</name>
 
@@ -11,8 +11,8 @@
 
     <asset src="www/exoplayer.js" target="js/exoplayer.js"/>
 
-    <js-module src="www/exoplayer.js" name="exoplayer">
-        <clobbers target="exoplayer"/>
+    <js-module src="www/exoplayer.js" name="ExoPlayer">
+        <clobbers target="ExoPlayer"/>
     </js-module>
 
     <platform name="android">

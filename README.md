@@ -6,6 +6,14 @@ Cordova media player plugin using Google's ExoPlayer framework.
 
 Please send us links to your cool projects made with this plugin so we can include them on this page!
 
+## Changes in version 2.3.0
+
+- Renamed plugin's namespace from window.exoplayer to window.ExoPlayer
+- Removed `init` method as there is no need to keep instance of the plugin around. Just call methods directly on window.ExoPlayer
+- `show` now takes configuration parameters as the first argumeent since we don't need init any more.
+- Renamed `playOffset` configuration element to `seekTo` to match the coresponding method that does the same thing
+- Replaced `play` and `pause` methods with single `playPause` that does both and keeps track of playback status
+
 ## Using
 
 Create a new Cordova Project
@@ -21,47 +29,39 @@ Install the plugin
 Edit `www/js/index.js` and add the following code inside `onDeviceReady`
 
 ```js
-    var success = function(message) {
+    var successCallback = function(json) {
     };
 
-    var failure = function(error) {
+    var errorCallback = function(error) {
     };
 
     var params = {
         url: "http://www.youtube.com/api/manifest/dash/id/bf5bb2419360daf1/source/youtube?as=fmp4_audio_clear,fmp4_sd_hd_clear&sparams=ip,ipbits,expire,source,id,as&ip=0.0.0.0&ipbits=0&expire=19000000000&signature=51AF5F39AB0CEC3E5497CD9C900EBFEAECCCB5C7.8506521BFC350652163895D4C26DEE124209AA9E&key=ik0"
     };
 
-    var player = exoplayer.init(params);
-    player.show(success, failure);
+    window.ExoPlayer.show(parameters, successCallback, errorCallback);
 ```
 
-Plugin methods
+Plugin methods exported via window.ExoPlayer
 ```js
 {
-    init(params)  // set player parameters
-    show(successCallback, errorCallback) // show player and add main callbacks
-    
-    setStream(url, controllerConfig) // switch stream without disposing of player. controllerConfig is "controller" part of the inital parameters. 
-
-    play() 
-    pause()
-    seekTo(milliseconds)
-
+    setStream(url, controllerConfig) // switch stream without disposing of the player. controllerConfig is "controller" part of the inital parameters. 
+    playPause() // will pause if playing and play if paused :-)
+    seekTo(milliseconds) // jump to particular poing into the stream
     getState(successCallback, errorCallback) // returns player state
-
-    close() // --> close and dispose of player
+    close() // close and dispose of player, very important to call this method when your app exits!
 }
 ```
 
-This is what `params` look like for `init` call, most of them are optional: 
+This is what `parameters` look like for the `show` call, most of them are optional: 
 ```js
 {
     url: 'https://devimages.apple.com.edgekey.net/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8',
     userAgent: 'MyAwesomePlayer', // default is 'ExoPlayerPlugin'
     aspectRatio: 'FILL_SCREEN', // default is FIT_SCREEN
-    hideTimeout: 5000, // Hide controls after this many milliseconds, default is 5sec
-    playOffset: 10 * 60 * 60 * 1000, // Start playback 10 minutes into video specified in milliseconds, default is 0
-    skipTime: 60 * 1000, // Amount of time to use when going forward/backward, default is 1min
+    hideTimeout: 5000, // Hide controls after this many milliseconds, default is 5 sec
+    seekTo: 10 * 60 * 60 * 1000, // Start playback 10 minutes into video specified in milliseconds, default is 0
+    skipTime: 60 * 1000, // Amount of time to use when going forward/backward, default is 1 min
     audioOnly: true, // Only play audio in the backgroud, default is false.
     subtitleUrl: 'http://url.to/subtitle.srt', // Optional subtitle url
     controller: { // If this object is not present controller will not be visible
@@ -131,7 +131,8 @@ Example of touch events:
     'eventAxisY':1321.8009033203125
 }
 
-{   'eventType':'TOUCH_EVENT',
+{   
+    'eventType':'TOUCH_EVENT',
     'eventAction':'ACTION_MOVE',
     'eventAxisX':543,
     'eventAxisY':1320.5
@@ -151,7 +152,14 @@ Install Android platform
     
 Run the code
 
-    cordova run 
+    cordova run
+    
+## Contributing
+    
+1. Fork it
+2. Create your feature branch off of current upstram branch (currently 2.0.0)
+3. Commit and push your changes to that branch
+4. Create new Pull Request
 
 ## More Info
 
