@@ -93,10 +93,34 @@ public class Plugin extends CordovaPlugin {
                 if (self.player == null) {
                     return false;
                 }
-                cordova.getActivity().runOnUiThread(new Runnable() {
+                cordova.getThreadPool().execute(new Runnable() {
                     public void run() {
                         JSONObject response = self.player.getPlayerState();
                         new CallbackResponse(callbackContext).send(PluginResult.Status.OK, response, false);
+                    }
+                });
+                return true;
+            }
+            else if (action.equals("showController")) {
+                if (self.player == null) {
+                    return false;
+                }
+                cordova.getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        self.player.showController();
+                        new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
+                    }
+                });
+                return true;
+            }
+            else if (action.equals("hideController")) {
+                if (self.player == null) {
+                    return false;
+                }
+                cordova.getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        self.player.hideController();
+                        new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
                     }
                 });
                 return true;

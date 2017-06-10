@@ -26,6 +26,7 @@ package co.frontyard.cordova.plugin.exoplayer;
 import android.view.*;
 import com.google.android.exoplayer2.*;
 import java.lang.*;
+import java.lang.Boolean;
 import java.lang.Integer;
 import java.lang.StackTraceElement;
 import java.lang.StringBuffer;
@@ -53,9 +54,10 @@ public class Payload {
         return state;
     }
 
-    public static JSONObject startEvent(ExoPlayer player) {
+    public static JSONObject startEvent(ExoPlayer player, String audioFocus) {
         Map<String, String> map = new HashMap<String, String>();
         map.put("eventType", "START_EVENT");
+        map.put("audioFocus", audioFocus);
         addPlayerState(map, player);
         return new JSONObject(map);
     }
@@ -93,11 +95,12 @@ public class Payload {
         return new JSONObject(map);
     }
 
-    public static JSONObject stateEvent(ExoPlayer player, int playbackState) {
+    public static JSONObject stateEvent(ExoPlayer player, int playbackState, boolean controllerVisible) {
         Map<String, String> map = new HashMap<String, String>();
         map.put("eventType", "STATE_CHANGED_EVENT");
         addPlayerState(map, player);
         map.put("playbackState", playbackStateToString(playbackState));
+        map.put("controllerVisible", Boolean.toString(controllerVisible));
         return new JSONObject(map);
     }
 

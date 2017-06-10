@@ -38,6 +38,12 @@ module.exports = {
     getState: function (successCallback, errorCallback) {
         cordova.exec(successCallback, errorCallback, "ExoPlayer", "getState", []);
     },
+    showController: function (successCallback, errorCallback) {
+        cordova.exec(successCallback, errorCallback, "ExoPlayer", "showController", []);
+    },
+    hideController: function (successCallback, errorCallback) {
+        cordova.exec(successCallback, errorCallback, "ExoPlayer", "hideController", []);
+    },
     close: function (successCallback, errorCallback) {
         cordova.exec(successCallback, errorCallback, "ExoPlayer", "close", []);
     }

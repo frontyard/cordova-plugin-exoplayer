@@ -6,6 +6,14 @@ Cordova media player plugin using Google's ExoPlayer framework.
 
 Please send us links to your cool projects made with this plugin so we can include them on this page!
 
+## Changes in version 2.4.0
+- Controller will no longer show automatically on touch and key events.
+- Added showController and hideController methods for explicit control of controller visibility.
+- Plugin will not longer close on KEYCODE_BACK key event, please call .close() explicitly.
+- Plugin will request audio focus on startup. It will also listen for audio focus events and pause/play on those events. It will close on AUDIOFOCUS_LOSS. 
+- START_EVENT will return additional info `audioFocus` which can be AUDIOFOCUS_REQUEST_FAILED or AUDIOFOCUS_REQUEST_GRANTED.
+- STATE_EVENT will return additional info `controllerVisible` to tell the app if controller is visible or not.
+
 ## Changes in version 2.3.0
 
 - Renamed plugin's namespace from window.exoplayer to window.ExoPlayer
@@ -49,6 +57,8 @@ Plugin methods exported via window.ExoPlayer
     playPause() // will pause if playing and play if paused :-)
     seekTo(milliseconds) // jump to particular poing into the stream
     getState(successCallback, errorCallback) // returns player state
+    showController() // shows player controller
+    hideController() // hides player controller
     close() // close and dispose of player, very important to call this method when your app exits!
 }
 ```
