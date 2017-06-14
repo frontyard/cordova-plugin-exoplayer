@@ -6,6 +6,10 @@ Cordova media player plugin using Google's ExoPlayer framework.
 
 Please send us links to your cool projects made with this plugin so we can include them on this page!
 
+## Changes in version 2.4.1
+- When audio focus changes, plugin will send `AUDIO_FOCUS_EVENT` with parameter `audioFocus` that can be on of:
+ `AUDIOFOCUS_LOSS_TRANSIENT`, `AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK`, `AUDIOFOCUS_GAIN`, `AUDIOFOCUS_LOSS`. 
+
 ## Changes in version 2.4.0
 - Controller will no longer show automatically on touch and key events.
 - Added showController and hideController methods for explicit control of controller visibility.

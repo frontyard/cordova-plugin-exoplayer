@@ -119,6 +119,14 @@ public class Payload {
         return new JSONObject(map);
     }
 
+    public static JSONObject audioFocusEvent(ExoPlayer player, String state) {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("eventType", "AUDIO_FOCUS_EVENT");
+        map.put("audioFocus", state);
+        addPlayerState(map, player);
+        return new JSONObject(map);
+    }
+
     public static JSONObject playerErrorEvent(ExoPlayer player, ExoPlaybackException origin, String message) {
         int type = 0;
         Map<String, String> map = new HashMap<String, String>();
