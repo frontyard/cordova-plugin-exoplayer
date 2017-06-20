@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         id="cordova-plugin-exoplayer"
-        version="2.4.3">
+        version="2.4.4">
 
     <name>ExoPlayer</name>
 
