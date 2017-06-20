@@ -359,6 +359,11 @@ public class Player {
         exoPlayer.setPlayWhenReady(true);
     }
 
+    private void stop() {
+        paused = false;
+        exoPlayer.stop();
+    }
+
     public void seekTo(long timeMillis) {
         long seekPosition = exoPlayer.getDuration() == 0 ? 0 : Math.min(Math.max(0, timeMillis), exoPlayer.getDuration());
         exoPlayer.seekTo(seekPosition);

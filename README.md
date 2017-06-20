@@ -6,6 +6,9 @@ Cordova media player plugin using Google's ExoPlayer framework.
 
 Please send us links to your cool projects made with this plugin so we can include them on this page!
 
+## Changes in version 2.4.3
+- Added `stop` method to fully stop the stream but not realease the player. Call `setStream` to restart the playback or `release` to dispose of it.
+
 ## Changes in version 2.4.2
 - Plugin no longer acts on audio focus event but rather let's Cordova app decide what to do.
 

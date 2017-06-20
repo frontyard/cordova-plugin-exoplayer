@@ -76,6 +76,19 @@ public class Plugin extends CordovaPlugin {
 
                 return true;
             }
+            else if (action.equals("stop")) {
+                if (self.player == null) {
+                    return false;
+                }
+                cordova.getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        self.player.stop();
+                        new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
+                    }
+                });
+
+                return true;
+            }
             else if (action.equals("seekTo")) {
                 if (self.player == null) {
                     return false;

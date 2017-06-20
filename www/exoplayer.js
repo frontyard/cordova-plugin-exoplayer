@@ -32,6 +32,9 @@ module.exports = {
     playPause: function (successCallback, errorCallback) {
         cordova.exec(successCallback, errorCallback, "ExoPlayer", "playPause", []);
     },
+    stop: function (successCallback, errorCallback) {
+        cordova.exec(successCallback, errorCallback, "ExoPlayer", "stop", []);
+    },
     seekTo: function (milliseconds, successCallback, errorCallback) {
         cordova.exec(successCallback, errorCallback, "ExoPlayer", "seekTo", [milliseconds]);
     },
