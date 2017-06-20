@@ -359,7 +359,7 @@ public class Player {
         exoPlayer.setPlayWhenReady(true);
     }
 
-    private void stop() {
+    public void stop() {
         paused = false;
         exoPlayer.stop();
     }
