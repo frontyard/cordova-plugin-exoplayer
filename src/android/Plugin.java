@@ -138,6 +138,19 @@ public class Plugin extends CordovaPlugin {
                 });
                 return true;
             }
+            else if (action.equals("setController")) {
+                if (self.player == null) {
+                    return false;
+                }
+                final JSONObject controller = data.optJSONObject(0);
+                cordova.getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        self.player.setController(controller);
+                        new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
+                    }
+                });
+                return true;
+            }
             else if (action.equals("close")) {
                 if (self.player == null) {
                     return false;

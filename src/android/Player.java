@@ -335,9 +335,7 @@ public class Player {
             exoPlayer.prepare(mediaSource);
             play();
         }
-        if (null != exoView) {
-            LayoutProvider.setupController(exoView, activity, controller);
-        }
+        setController(controller);
     }
 
     public void playPause() {
@@ -386,6 +384,12 @@ public class Player {
     public void hideController() {
         if (null != exoView) {
             exoView.hideController();
+        }
+    }
+
+    public void setController(JSONObject controller) {
+        if (null != exoView) {
+            LayoutProvider.setupController(exoView, activity, controller);
         }
     }
 
