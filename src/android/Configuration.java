@@ -68,8 +68,12 @@ public class Configuration {
         return config.optInt("hideTimeout", 5000); // Default 5 sec.
     }
 
-    public int getSkipTimeMs() {
-        return config.optInt("skipTime", 60000); // Default 1 min.
+    public int getForwardTimeMs() {
+        return config.optInt("forwardTime", 60000); // Default 1 min.
+    }
+
+    public int getRewindTimeMs() {
+        return config.optInt("rewindTime", 60000); // Default 1 min.
     }
 
     public String getSubtitleUrl() {

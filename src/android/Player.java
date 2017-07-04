@@ -101,7 +101,8 @@ public class Player {
 
         @Override
         public void onTimelineChanged(Timeline timeline, Object manifest) {
-            // Need to see if we want to send this to Cordova.
+            JSONObject payload = Payload.timelineChangedEvent(Player.this.exoPlayer, timeline, manifest);
+            new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
         }
 
         @Override

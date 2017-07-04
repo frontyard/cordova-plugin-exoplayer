@@ -25,6 +25,8 @@ package co.frontyard.cordova.plugin.exoplayer;
 
 import android.view.*;
 import com.google.android.exoplayer2.*;
+import com.google.android.exoplayer2.source.*;
+import com.google.android.exoplayer2.trackselection.*;
 import java.lang.*;
 import java.lang.Boolean;
 import java.lang.Integer;
@@ -115,6 +117,20 @@ public class Payload {
         Map<String, String> map = new HashMap<String, String>();
         map.put("eventType", "SEEK_EVENT");
         map.put("offset", Long.toString(offset));
+        addPlayerState(map, player);
+        return new JSONObject(map);
+    }
+
+    public static JSONObject timelineChangedEvent(ExoPlayer player, Timeline timeline, Object manifest) {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("eventType", "TIMELINE_EVENT");
+        int periodCount = timeline.getPeriodCount();
+        for (int i = 0; i < periodCount; i++) {
+            Timeline.Period period = new Timeline.Period();
+            timeline.getPeriod(i, period);
+            map.put("periodDuration" + i, Long.toString(period.getDurationMs()));
+            map.put("periodWindowPosition" + i, Long.toString(period.getPositionInWindowMs()));
+        }
         addPlayerState(map, player);
         return new JSONObject(map);
     }

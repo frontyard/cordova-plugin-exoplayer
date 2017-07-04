@@ -53,8 +53,8 @@ public class LayoutProvider {
         if (config.isAspectRatioFillScreen()) {
             view.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
         }
-        view.setFastForwardIncrementMs(config.getSkipTimeMs());
-        view.setRewindIncrementMs(config.getSkipTimeMs());
+        view.setFastForwardIncrementMs(config.getForwardTimeMs());
+        view.setRewindIncrementMs(config.getRewindTimeMs());
         view.setShowMultiWindowTimeBar(true);
         view.setControllerHideOnTouch(true);
         view.setControllerShowTimeoutMs(config.getHideTimeout());

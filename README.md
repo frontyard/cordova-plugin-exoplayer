@@ -6,6 +6,10 @@ Cordova media player plugin using Google's ExoPlayer framework.
 
 Please send us links to your cool projects made with this plugin so we can include them on this page!
 
+## Changes in version 2.5.0
+- Removed configuration element `skipTime` and replaced it with separate `forwardTime` and `rewindTime`.
+- Sending `TIMELINE_EVENT` to Cordova with `periodDurationX` and `periodWindowPositionX` properties for duration and window position for each period (marked X) in the stream.  
+
 ## Changes in version 2.4.5
 - Added `setController` method to update the controller mid-stream. It accepts the same controller object that is used as part of parameters for `show` method.
 
@@ -84,7 +88,8 @@ This is what `parameters` look like for the `show` call, most of them are option
     aspectRatio: 'FILL_SCREEN', // default is FIT_SCREEN
     hideTimeout: 5000, // Hide controls after this many milliseconds, default is 5 sec
     seekTo: 10 * 60 * 60 * 1000, // Start playback 10 minutes into video specified in milliseconds, default is 0
-    skipTime: 60 * 1000, // Amount of time to use when going forward/backward, default is 1 min
+    forwardTime: 60 * 1000, // Amount of time to use when skipping forward, default is 1 min
+    rewindTime: 60 * 1000, // Amount of time to use when skipping backward, default is 1 min
     audioOnly: true, // Only play audio in the backgroud, default is false.
     subtitleUrl: 'http://url.to/subtitle.srt', // Optional subtitle url
     controller: { // If this object is not present controller will not be visible
@@ -126,6 +131,7 @@ STATE_CHANGED_EVENT
 POSITION_DISCONTINUITY_EVENT
 SEEK_EVENT
 PLAYER_ERROR_EVENT
+TIMELINE_EVENT
 ```
 Each event will send JSON payload coresponding to that event. Some events (where appropriate) will also send additional information about playback like duration, postion, etc. 
 
