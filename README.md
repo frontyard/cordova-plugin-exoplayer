@@ -200,8 +200,6 @@ General ExoPlayer [documentation](https://google.github.io/ExoPlayer/)
 
 ExoPlayer [source code](https://github.com/google/ExoPlayer)
 
-[![Support via PayPal](https://cdn.rawgit.com/twolfson/paypal-github-button/1.0.0/dist/button.svg)](https://www.paypal.me/frontyard/)
-
 ## Donation
 If this project helps you consider donating to support it!
 
