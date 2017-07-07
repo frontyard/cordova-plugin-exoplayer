@@ -199,3 +199,5 @@ For more info on plugins see the [Plugin Development Guide](http://cordova.apach
 General ExoPlayer [documentation](https://google.github.io/ExoPlayer/)
 
 ExoPlayer [source code](https://github.com/google/ExoPlayer)
+
+[![Support via PayPal](https://raw.githubusercontent.com/frontyard/cordova-plugin-exoplayer/2.0.0/donate.svg)](https://www.paypal.me/frontyard/)
