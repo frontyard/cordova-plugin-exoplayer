@@ -200,4 +200,4 @@ General ExoPlayer [documentation](https://google.github.io/ExoPlayer/)
 
 ExoPlayer [source code](https://github.com/google/ExoPlayer)
 
-[![Support via PayPal](https://raw.githubusercontent.com/frontyard/cordova-plugin-exoplayer/2.0.0/donate.svg)](https://www.paypal.me/frontyard/)
+[![Support via PayPal](https://cdn.rawgit.com/twolfson/paypal-github-button/1.0.0/dist/button.svg)](https://www.paypal.me/frontyard/)
