@@ -1,4 +1,4 @@
-[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE) [![Build Status](https://travis-ci.org/frontyard/cordova-plugin-exoplayer.svg?branch=2.0.0)](https://travis-ci.org/frontyard/cordova-plugin-exoplayer) [![Code Climate](https://codeclimate.com/github/frontyard/cordova-plugin-exoplayer/badges/gpa.svg)](https://codeclimate.com/github/frontyard/cordova-plugin-exoplayer)
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE) [![Build Status](https://travis-ci.org/frontyard/cordova-plugin-exoplayer.svg?branch=2.0.0)](https://travis-ci.org/frontyard/cordova-plugin-exoplayer) [![Code Climate](https://codeclimate.com/github/frontyard/cordova-plugin-exoplayer/badges/gpa.svg)](https://codeclimate.com/github/frontyard/cordova-plugin-exoplayer) [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2ZPEB7VKFG2CY)
 
 # Cordova ExoPlayer Plugin
 
@@ -201,3 +201,8 @@ General ExoPlayer [documentation](https://google.github.io/ExoPlayer/)
 ExoPlayer [source code](https://github.com/google/ExoPlayer)
 
 [![Support via PayPal](https://cdn.rawgit.com/twolfson/paypal-github-button/1.0.0/dist/button.svg)](https://www.paypal.me/frontyard/)
+
+## Donation
+If this project helps you consider donating to support it!
+
+[![paypal](https://cdn.rawgit.com/twolfson/paypal-github-button/1.0.0/dist/button.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2ZPEB7VKFG2CY)
