@@ -250,7 +250,10 @@ public class Player {
                 exoPlayer.seekTo(offset);
             }
             exoPlayer.prepare(mediaSource);
-            exoPlayer.setPlayWhenReady(true);
+            exoPlayer.setPlayWhenReady(config.autoPlay());
+            if (!config.autoPlay()) {
+                paused = true;
+            }
             JSONObject payload = Payload.startEvent(exoPlayer, audioFocusString);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
         }

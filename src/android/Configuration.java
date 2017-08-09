@@ -56,6 +56,10 @@ public class Configuration {
         return config.optBoolean("audioOnly");
     }
 
+    public boolean autoPlay() {
+        return config.optBoolean("autoPlay", true);
+    }
+
     public long getSeekTo() {
         return config.optLong("seekTo", -1);
     }
