@@ -6,6 +6,10 @@ Cordova media player plugin using Google's ExoPlayer framework.
 
 Please send us links to your cool projects made with this plugin so we can include them on this page!
 
+## Changes in version 2.5.1
+- Added boolean options `hidePosition` and `hideDuration`. When playing dvr content thise numbers are relative to current time and very confusing to users. Adding ability to hide the numbers until better solution can be found.
+- Added `autoPlay` (defaults to true) to allow user not to play the stream automatically. Must call `play` explicitly.
+
 ## Changes in version 2.5.0
 - Removed configuration element `skipTime` and replaced it with separate `forwardTime` and `rewindTime`.
 - Sending `TIMELINE_EVENT` to Cordova with `periodDurationX` and `periodWindowPositionX` properties for duration and window position for each period (marked X) in the stream.  
@@ -87,6 +91,7 @@ This is what `parameters` look like for the `show` call, most of them are option
     userAgent: 'MyAwesomePlayer', // default is 'ExoPlayerPlugin'
     aspectRatio: 'FILL_SCREEN', // default is FIT_SCREEN
     hideTimeout: 5000, // Hide controls after this many milliseconds, default is 5 sec
+    autoPlay: true, // When set to false stream will not automatically start
     seekTo: 10 * 60 * 60 * 1000, // Start playback 10 minutes into video specified in milliseconds, default is 0
     forwardTime: 60 * 1000, // Amount of time to use when skipping forward, default is 1 min
     rewindTime: 60 * 1000, // Amount of time to use when skipping backward, default is 1 min
@@ -96,7 +101,9 @@ This is what `parameters` look like for the `show` call, most of them are option
         streamImage: 'http://url.to/channel.png',
         streamTitle: 'My channel',
         streamDescription: '2nd line you can use to display whatever you want',
-        hideProgress: true,
+        hideProgress: true, // Hide entire progress timebar
+        hidePosition: false, // If timebar is visible hide current position from it
+        hideDuration: false, // If timebar is visible Hide stream duration from it
         controlIcons: {
             'exo_rew': 'http://url.to/rew.png',
             'exo_play': 'http://url.to/play.png',

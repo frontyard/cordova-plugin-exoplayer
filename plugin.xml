@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         id="cordova-plugin-exoplayer"
-        version="2.5.0">
+        version="2.5.1">
 
     <name>ExoPlayer</name>
 
@@ -9,7 +9,7 @@
         <engine name="cordova" version=">=3.4.0"/>
     </engines>
 
-    <asset src="www/exoplayer.js" target="js/exoplayer.js"/>
+    <asset src="www/ExoPlayer.js" target="js/exoplayer.js"/>
 
     <js-module src="www/exoplayer.js" name="ExoPlayer">
         <clobbers target="ExoPlayer"/>
@@ -17,6 +17,7 @@
 
     <platform name="android">
         <framework src="com.google.android.exoplayer:exoplayer:r2.4.0"/>
+        <framework src="com.google.android.exoplayer:extension-okhttp:r2.4.0"/>
         <framework src="com.squareup.picasso:picasso:2.5.2"/>
 
         <config-file target="res/xml/config.xml" parent="/*">

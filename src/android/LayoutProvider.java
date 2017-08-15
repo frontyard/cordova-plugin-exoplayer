@@ -109,12 +109,13 @@ public class LayoutProvider {
         String streamTitle = controller.optString("streamTitle", null);
         String streamDescription = controller.optString("streamDescription", null);
         String streamImage = controller.optString("streamImage", null);
-        boolean hideProgress = controller.optBoolean("hideProgress");
 
         ImageView imageView = (ImageView) findView(parentView, activity, "exo_image");
         TextView titleView = (TextView) findView(parentView, activity, "exo_title");
         TextView subtitleView = (TextView) findView(parentView, activity, "exo_subtitle");
         View timebarView = findView(parentView, activity, "exo_timebar");
+        TextView positionView = (TextView) findView(timebarView, activity, "exo_position");
+        TextView durationView = (TextView) findView(timebarView, activity, "exo_duration");
 
         if(null != streamImage) {
             Picasso.with(imageView.getContext()).load(streamImage).into(imageView);
@@ -126,12 +127,18 @@ public class LayoutProvider {
             timebarView.setVisibility(View.GONE);
             subtitleView.setText(streamDescription);
         }
-        else if (hideProgress) {
+        else if (controller.optBoolean("hideProgress")) {
             timebarView.setVisibility(View.GONE);
             subtitleView.setText(streamDescription);
         }
         else {
             subtitleView.setVisibility(View.GONE);
+        }
+        if (controller.optBoolean("hidePosition")) {
+            positionView.setVisibility(View.GONE);
+        }
+        if (controller.optBoolean("hideDuration")) {
+            durationView.setVisibility(View.GONE);
         }
     }
 
