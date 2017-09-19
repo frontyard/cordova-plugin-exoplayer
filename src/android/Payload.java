@@ -23,6 +23,7 @@
  */
 package co.frontyard.cordova.plugin.exoplayer;
 
+import android.util.*;
 import android.view.*;
 import com.google.android.exoplayer2.*;
 import com.google.android.exoplayer2.source.*;
@@ -149,8 +150,25 @@ public class Payload {
         map.put("eventType", "PLAYER_ERROR_EVENT");
 
         if (null != origin) {
-            type = origin.type;
             Throwable error = (Throwable) origin;
+
+            type = origin.type;
+            if (type == ExoPlaybackException.TYPE_RENDERER) {
+                error = origin.getRendererException();
+                map.put("errorType", "RENDERER");
+            }
+            else if (type == ExoPlaybackException.TYPE_SOURCE) {
+                error = origin.getSourceException();
+                map.put("errorType", "SOURCE");
+            }
+            else if (type == ExoPlaybackException.TYPE_UNEXPECTED) {
+                error = origin.getUnexpectedException();
+                map.put("errorType", "UNEXPECTED");
+            }
+            else {
+                map.put("errorType", "UNKNOWN");
+            }
+
             while (null != error.getCause()) {
                 error = error.getCause();
             }
@@ -172,31 +190,21 @@ public class Payload {
             map.put("customMessage", message);
         }
 
-        switch (type) {
-            case ExoPlaybackException.TYPE_RENDERER:
-                map.put("errorType", "RENDERER");
-                break;
-            case ExoPlaybackException.TYPE_SOURCE:
-                map.put("errorType", "SOURCE");
-                break;
-            case ExoPlaybackException.TYPE_UNEXPECTED:
-                map.put("errorType", "UNEXPECTED");
-                break;
-            default:
-                map.put("errorType", "UNKNOWN");
-                break;
-        }
-
         return new JSONObject(map);
     }
 
     private static void addPlayerState(Map<String, String> map, ExoPlayer player) {
         if (null != player) {
-            map.put("duration", Long.toString(player.getDuration()));
-            map.put("position", Long.toString(player.getCurrentPosition()));
-            map.put("playWhenReady", Boolean.toString(player.getPlayWhenReady()));
-            map.put("playbackState", playbackStateToString(player.getPlaybackState()));
-            map.put("bufferPercentage", Integer.toString(player.getBufferedPercentage()));
+            try {
+                map.put("duration", Long.toString(player.getDuration()));
+                map.put("position", Long.toString(player.getCurrentPosition()));
+                map.put("playWhenReady", Boolean.toString(player.getPlayWhenReady()));
+                map.put("playbackState", playbackStateToString(player.getPlaybackState()));
+                map.put("bufferPercentage", Integer.toString(player.getBufferedPercentage()));
+            }
+            catch(Exception ex) {
+                Log.e(Player.TAG, "Error adding player state", ex);
+            }
         }
     }
 }

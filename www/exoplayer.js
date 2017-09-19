@@ -38,6 +38,9 @@ module.exports = {
     seekTo: function (milliseconds, successCallback, errorCallback) {
         cordova.exec(successCallback, errorCallback, "ExoPlayer", "seekTo", [milliseconds]);
     },
+    seekBy: function (milliseconds, successCallback, errorCallback) {
+        cordova.exec(successCallback, errorCallback, "ExoPlayer", "seekBy", [milliseconds]);
+    },
     getState: function (successCallback, errorCallback) {
         cordova.exec(successCallback, errorCallback, "ExoPlayer", "getState", []);
     },

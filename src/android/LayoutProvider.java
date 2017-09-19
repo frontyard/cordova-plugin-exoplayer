@@ -36,7 +36,6 @@ import org.json.*;
 import com.squareup.picasso.*;
 
 public class LayoutProvider {
-    private static final String TAG = "ExoPlayerPlugin";
     private enum BUTTON { exo_prev, exo_rew, exo_play, exo_pause, exo_ffwd, exo_next }
 
     public static FrameLayout getMainLayout(Activity activity) {
@@ -47,7 +46,7 @@ public class LayoutProvider {
         return view;
     }
 
-    public static SimpleExoPlayerView getExoPlayer(Activity activity, Configuration config) {
+    public static SimpleExoPlayerView getExoPlayerView(Activity activity, Configuration config) {
         SimpleExoPlayerView view = new SimpleExoPlayerView(activity);
         view.setLayoutParams(new LinearLayout.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT));
         if (config.isAspectRatioFillScreen()) {
@@ -85,16 +84,16 @@ public class LayoutProvider {
                     if (null != imageButton) {
                         String buttonUrl = buttonsConfig.optString(buttonName);
                         if (null == buttonUrl) {
-                            Log.i(TAG, "Hiding " + buttonName + " button");
+                            Log.i(Player.TAG, "Hiding " + buttonName + " button");
                             imageButton.setVisibility(View.GONE);
                         }
                         else {
-                            Log.i(TAG, "Loading " + buttonName + " from " + buttonUrl);
+                            Log.i(Player.TAG, "Loading " + buttonName + " from " + buttonUrl);
                             Picasso.with(imageButton.getContext()).load(buttonUrl).into(imageButton);
                         }
                     }
                     else {
-                        Log.e(TAG, "ImageButton " + buttonName + " not found!");
+                        Log.e(Player.TAG, "ImageButton " + buttonName + " not found!");
                     }
                 }
             }
@@ -124,21 +123,21 @@ public class LayoutProvider {
             titleView.setText(streamTitle);
         }
         if (null != streamDescription && !streamDescription.equals("null")) { // TODO: Why are we getting string "null" here?
-            timebarView.setVisibility(View.GONE);
-            subtitleView.setText(streamDescription);
-        }
-        else if (controller.optBoolean("hideProgress")) {
-            timebarView.setVisibility(View.GONE);
             subtitleView.setText(streamDescription);
         }
         else {
             subtitleView.setVisibility(View.GONE);
         }
-        if (controller.optBoolean("hidePosition")) {
-            positionView.setVisibility(View.GONE);
+        if (controller.optBoolean("hideProgress")) {
+            timebarView.setVisibility(View.GONE);
         }
-        if (controller.optBoolean("hideDuration")) {
-            durationView.setVisibility(View.GONE);
+        else {
+            if (controller.optBoolean("hidePosition")) {
+                positionView.setVisibility(View.GONE);
+            }
+            if (controller.optBoolean("hideDuration")) {
+                durationView.setVisibility(View.GONE);
+            }
         }
     }
 

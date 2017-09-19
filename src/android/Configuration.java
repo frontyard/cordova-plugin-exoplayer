@@ -28,8 +28,6 @@ import android.view.*;
 import org.json.*;
 
 public class Configuration {
-    static final String TAG = "ExoPlayerPlugin";
-
     private final JSONObject config;
 
     public Configuration(JSONObject config) {
@@ -82,5 +80,17 @@ public class Configuration {
 
     public String getSubtitleUrl() {
         return config.optString("subtitleUrl", null);
+    }
+
+    public int getConnectTimeout() {
+        return config.optInt("connectTimeout", 10000); // Default 10 sec.
+    }
+
+    public int getReadTimeout() {
+        return config.optInt("readTimeout", 10000); // Default 10 sec.
+    }
+
+    public int getRetryCount() {
+        return config.optInt("retryCount", 10);
     }
 }

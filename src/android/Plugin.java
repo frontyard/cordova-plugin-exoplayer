@@ -93,11 +93,24 @@ public class Plugin extends CordovaPlugin {
                 if (self.player == null) {
                     return false;
                 }
-                final long seekTime = data.optLong(0, 0);
+                final long seekTo = data.optLong(0, 0);
                 cordova.getActivity().runOnUiThread(new Runnable() {
                     public void run() {
-                        self.player.seekTo(seekTime);
-                        new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
+                        JSONObject payload = self.player.seekTo(seekTo);
+                        new CallbackResponse(callbackContext).send(PluginResult.Status.OK, payload, true);
+                    }
+                });
+                return true;
+            }
+            else if (action.equals("seekBy")) {
+                if (self.player == null) {
+                    return false;
+                }
+                final long seekBy = data.optLong(0, 0);
+                cordova.getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        JSONObject payload = self.player.seekBy(seekBy);
+                        new CallbackResponse(callbackContext).send(PluginResult.Status.OK, payload, true);
                     }
                 });
                 return true;

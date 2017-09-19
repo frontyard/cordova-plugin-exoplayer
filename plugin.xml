@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         id="cordova-plugin-exoplayer"
-        version="2.5.1">
+        version="2.5.2">
 
     <name>ExoPlayer</name>
+    <description>Cordova Plugin implementing ExoPlayer video/audio player</description>
+    <keywords>ecosystem:cordova,cordova-android,phonegap,cordova,ionic,android,exoplayer,exo,video,player</keywords>
+    <license>MIT</license>
 
     <engines>
         <engine name="cordova" version=">=3.4.0"/>
@@ -16,8 +19,8 @@
     </js-module>
 
     <platform name="android">
-        <framework src="com.google.android.exoplayer:exoplayer:r2.4.0"/>
-        <framework src="com.google.android.exoplayer:extension-okhttp:r2.4.0"/>
+        <framework src="com.google.android.exoplayer:exoplayer:r2.5.1"/>
+        <framework src="com.google.android.exoplayer:extension-okhttp:r2.5.1"/>
         <framework src="com.squareup.picasso:picasso:2.5.2"/>
 
         <config-file target="res/xml/config.xml" parent="/*">

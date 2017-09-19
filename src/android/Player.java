@@ -45,11 +45,13 @@ import com.squareup.picasso.*;
 import java.lang.*;
 import java.lang.Math;
 import java.lang.Override;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import org.apache.cordova.*;
 import org.json.*;
 
 public class Player {
-    private static final String TAG = "ExoPlayerPlugin";
+    public static final String TAG = "ExoPlayerPlugin";
     private final Activity activity;
     private final CallbackContext callbackContext;
     private final Configuration config;
@@ -60,6 +62,7 @@ public class Player {
     private int controllerVisibility;
     private boolean paused = false;
     private AudioManager audioManager;
+    private DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
 
     public Player(Configuration config, Activity activity, CallbackContext callbackContext, CordovaWebView webView) {
         this.config = config;
@@ -107,6 +110,11 @@ public class Player {
 
         @Override
         public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+            // Need to see if we want to send this to Cordova.
+        }
+
+        @Override
+        public void onRepeatModeChanged(int newRepeatMode) {
             // Need to see if we want to send this to Cordova.
         }
     };
@@ -209,7 +217,7 @@ public class Player {
         dialog.setOnDismissListener(dismissListener);
 
         FrameLayout mainLayout = LayoutProvider.getMainLayout(this.activity);
-        exoView = LayoutProvider.getExoPlayer(this.activity, config);
+        exoView = LayoutProvider.getExoPlayerView(this.activity, config);
         exoView.setControllerVisibilityListener(playbackControlVisibilityListener);
 
         mainLayout.addView(exoView);
@@ -218,7 +226,9 @@ public class Player {
 
         dialog.getWindow().setAttributes(LayoutProvider.getDialogLayoutParams(activity, config, dialog));
         exoView.requestFocus();
-        exoView.setOnTouchListener(onTouchListener);
+        if (activity.getPackageManager().hasSystemFeature("android.hardware.touchscreen")) {
+            exoView.setOnTouchListener(onTouchListener);
+        }
         LayoutProvider.setupController(exoView, activity, config.getController());
     }
 
@@ -232,7 +242,6 @@ public class Player {
         String audioFocusString = audioFocusResult == AudioManager.AUDIOFOCUS_REQUEST_FAILED ?
                 "AUDIOFOCUS_REQUEST_FAILED" :
                 "AUDIOFOCUS_REQUEST_GRANTED";
-        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
         //TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveVideoTrackSelection.Factory(bandwidthMeter);
         TrackSelector trackSelector = new DefaultTrackSelector();
         LoadControl loadControl = new DefaultLoadControl();
@@ -243,12 +252,13 @@ public class Player {
             exoView.setPlayer(exoPlayer);
         }
 
-        MediaSource mediaSource = getMediaSource(uri, bandwidthMeter);
+        MediaSource mediaSource = getMediaSource(uri);
         if (mediaSource != null) {
-            long offset = config.getSeekTo();
-            if (offset > -1) {
-                exoPlayer.seekTo(offset);
+            long seekTo = config.getSeekTo();
+            if (seekTo > -1) {
+                exoPlayer.seekTo(seekTo);
             }
+            //exoPlayer.setRepeatMode(Player.REPEAT_MODE_OFF);
             exoPlayer.prepare(mediaSource);
             exoPlayer.setPlayWhenReady(config.autoPlay());
             if (!config.autoPlay()) {
@@ -262,12 +272,12 @@ public class Player {
         }
     }
 
-    private MediaSource getMediaSource(Uri uri, DefaultBandwidthMeter bandwidthMeter) {
+    private MediaSource getMediaSource(Uri uri) {
         String userAgent = Util.getUserAgent(this.activity, config.getUserAgent());
         Handler mainHandler = new Handler();
-        int connectTimeout = 10 * 1000;
-        int readTimeout = 10 * 1000;
-        int retryCount = 10;
+        int connectTimeout = config.getConnectTimeout();
+        int readTimeout = config.getReadTimeout();
+        int retryCount = config.getRetryCount();
 
         HttpDataSource.Factory httpDataSourceFactory = new DefaultHttpDataSourceFactory(userAgent, bandwidthMeter, connectTimeout, readTimeout, true);
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this.activity, bandwidthMeter, httpDataSourceFactory);
@@ -300,7 +310,7 @@ public class Player {
             Uri subtitleUri = Uri.parse(subtitleUrl);
             String subtitleType = inferSubtitleType(subtitleUri);
             Log.i(TAG, "Subtitle present: " + subtitleUri + ", type=" + subtitleType);
-            Format textFormat = Format.createTextSampleFormat(null, subtitleType, null, Format.NO_VALUE, Format.NO_VALUE, "en", null);
+            com.google.android.exoplayer2.Format textFormat = com.google.android.exoplayer2.Format.createTextSampleFormat(null, subtitleType, null, com.google.android.exoplayer2.Format.NO_VALUE, com.google.android.exoplayer2.Format.NO_VALUE, "en", null, 0);
             MediaSource subtitleSource = new SingleSampleMediaSource(subtitleUri, httpDataSourceFactory, textFormat, C.TIME_UNSET);
             return new MergingMediaSource(mediaSource, subtitleSource);
         }
@@ -334,8 +344,7 @@ public class Player {
 
     public void setStream(Uri uri, JSONObject controller) {
         if (null != uri) {
-            DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-            MediaSource mediaSource = getMediaSource(uri, bandwidthMeter);
+            MediaSource mediaSource = getMediaSource(uri);
             exoPlayer.prepare(mediaSource);
             play();
         }
@@ -366,11 +375,23 @@ public class Player {
         exoPlayer.stop();
     }
 
-    public void seekTo(long timeMillis) {
-        long seekPosition = exoPlayer.getDuration() == 0 ? 0 : Math.min(Math.max(0, timeMillis), exoPlayer.getDuration());
-        exoPlayer.seekTo(seekPosition);
-        JSONObject payload = Payload.seekEvent(Player.this.exoPlayer, timeMillis);
-        new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
+    private long normalizeOffset(long newTime) {
+        long duration = exoPlayer.getDuration();
+        return duration == 0 ? 0 : Math.min(Math.max(0, newTime), duration);
+    }
+
+    public JSONObject seekTo(long timeMillis) {
+        long newTime = normalizeOffset(timeMillis);
+        exoPlayer.seekTo(newTime);
+        JSONObject payload = Payload.seekEvent(Player.this.exoPlayer, newTime);
+        return payload;
+    }
+
+    public JSONObject seekBy(long timeMillis) {
+        long newTime = normalizeOffset(exoPlayer.getCurrentPosition() + timeMillis);
+        exoPlayer.seekTo(newTime);
+        JSONObject payload = Payload.seekEvent(Player.this.exoPlayer, newTime);
+        return payload;
     }
 
     public JSONObject getPlayerState() {

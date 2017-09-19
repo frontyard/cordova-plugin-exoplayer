@@ -6,12 +6,18 @@ Cordova media player plugin using Google's ExoPlayer framework.
 
 Please send us links to your cool projects made with this plugin so we can include them on this page!
 
+## Changes in version 2.5.2
+- Upgraded exoplayer to version 2.5.1
+- Only adding touchscreen event handler if device has "android.hardware.touchscreen" system feature.
+- Added `connectTimeout`, `readTimeout` and `retryCount` configuration settings. These are related to http client player uses. 
+- Added `seekBy` which is simmilar to seekTo but operates relative to the current possition. Value can be positive (seek forward) or negative (seek backwards). 
+
 ## Changes in version 2.5.1
 - Added boolean options `hidePosition` and `hideDuration`. When playing dvr content thise numbers are relative to current time and very confusing to users. Adding ability to hide the numbers until better solution can be found.
 - Added `autoPlay` (defaults to true) to allow user not to play the stream automatically. Must call `play` explicitly.
 
 ## Changes in version 2.5.0
-- Removed configuration element `skipTime` and replaced it with separate `forwardTime` and `rewindTime`.
+- Removed configuration setting `skipTime` and replaced it with separate `forwardTime` and `rewindTime`.
 - Sending `TIMELINE_EVENT` to Cordova with `periodDurationX` and `periodWindowPositionX` properties for duration and window position for each period (marked X) in the stream.  
 
 ## Changes in version 2.4.5
@@ -40,7 +46,7 @@ Please send us links to your cool projects made with this plugin so we can inclu
 - Renamed plugin's namespace from window.exoplayer to window.ExoPlayer
 - Removed `init` method as there is no need to keep instance of the plugin around. Just call methods directly on window.ExoPlayer
 - `show` now takes configuration parameters as the first argumeent since we don't need init any more.
-- Renamed `playOffset` configuration element to `seekTo` to match the coresponding method that does the same thing
+- Renamed `playOffset` configuration setting to `seekTo` to match the coresponding method that does the same thing
 - Replaced `play` and `pause` methods with single `playPause` that does both and keeps track of playback status
 
 ## Using
@@ -76,10 +82,12 @@ Plugin methods exported via window.ExoPlayer
 {
     setStream(url, controllerConfig) // switch stream without disposing of the player. controllerConfig is "controller" part of the inital parameters. 
     playPause() // will pause if playing and play if paused :-)
+    stop() // will stop the current stream
     seekTo(milliseconds) // jump to particular poing into the stream
     getState(successCallback, errorCallback) // returns player state
     showController() // shows player controller
     hideController() // hides player controller
+    setController() // sets `controller` part of configuration related to the info bar and control buttons.
     close() // close and dispose of player, very important to call this method when your app exits!
 }
 ```
@@ -92,15 +100,20 @@ This is what `parameters` look like for the `show` call, most of them are option
     aspectRatio: 'FILL_SCREEN', // default is FIT_SCREEN
     hideTimeout: 5000, // Hide controls after this many milliseconds, default is 5 sec
     autoPlay: true, // When set to false stream will not automatically start
-    seekTo: 10 * 60 * 60 * 1000, // Start playback 10 minutes into video specified in milliseconds, default is 0
-    forwardTime: 60 * 1000, // Amount of time to use when skipping forward, default is 1 min
-    rewindTime: 60 * 1000, // Amount of time to use when skipping backward, default is 1 min
+    seekTo: 10 * 60 * 60 * 1000, // Start playback 10 minutes into video specified in ms, default is 0
+    forwardTime: 60 * 1000, // Amount of time in ms to use when skipping forward, default is 1 min
+    rewindTime: 60 * 1000, // Amount of time in ms to use when skipping backward, default is 1 min
     audioOnly: true, // Only play audio in the backgroud, default is false.
     subtitleUrl: 'http://url.to/subtitle.srt', // Optional subtitle url
+    connectTimeout: 1000, // okhttp connect timeout in ms (default is 0)
+    readTimeout: 1000, // okhttp read timeout in ms (default is 0)
+    writeTimeout: 1000, // okhttp write timeout in ms (default is 0)
+    pingInterval: 1000, // okhttp socket ping interval in ms (default is 0 or disabled)
+    retryCount: 5, // number of times datasource will retry the stream before giving up (default is 3)
     controller: { // If this object is not present controller will not be visible
         streamImage: 'http://url.to/channel.png',
-        streamTitle: 'My channel',
-        streamDescription: '2nd line you can use to display whatever you want',
+        streamTitle: 'Cool channel / movie',
+        streamDescription: '2nd line you can use to display whatever you want like current program epg or movie description',
         hideProgress: true, // Hide entire progress timebar
         hidePosition: false, // If timebar is visible hide current position from it
         hideDuration: false, // If timebar is visible Hide stream duration from it
