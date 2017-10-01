@@ -45,8 +45,6 @@ import com.squareup.picasso.*;
 import java.lang.*;
 import java.lang.Math;
 import java.lang.Override;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 import org.apache.cordova.*;
 import org.json.*;
 
@@ -62,7 +60,6 @@ public class Player {
     private int controllerVisibility;
     private boolean paused = false;
     private AudioManager audioManager;
-    private DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
 
     public Player(Configuration config, Activity activity, CallbackContext callbackContext, CordovaWebView webView) {
         this.config = config;
@@ -226,9 +223,7 @@ public class Player {
 
         dialog.getWindow().setAttributes(LayoutProvider.getDialogLayoutParams(activity, config, dialog));
         exoView.requestFocus();
-        if (activity.getPackageManager().hasSystemFeature("android.hardware.touchscreen")) {
             exoView.setOnTouchListener(onTouchListener);
-        }
         LayoutProvider.setupController(exoView, activity, config.getController());
     }
 
@@ -242,6 +237,7 @@ public class Player {
         String audioFocusString = audioFocusResult == AudioManager.AUDIOFOCUS_REQUEST_FAILED ?
                 "AUDIOFOCUS_REQUEST_FAILED" :
                 "AUDIOFOCUS_REQUEST_GRANTED";
+        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
         //TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveVideoTrackSelection.Factory(bandwidthMeter);
         TrackSelector trackSelector = new DefaultTrackSelector();
         LoadControl loadControl = new DefaultLoadControl();
@@ -252,18 +248,18 @@ public class Player {
             exoView.setPlayer(exoPlayer);
         }
 
-        MediaSource mediaSource = getMediaSource(uri);
+        MediaSource mediaSource = getMediaSource(uri, bandwidthMeter);
         if (mediaSource != null) {
-            long seekTo = config.getSeekTo();
-            if (seekTo > -1) {
-                exoPlayer.seekTo(seekTo);
+            long offset = config.getSeekTo();
+            boolean autoPlay = config.autoPlay();
+            if (offset > -1) {
+                exoPlayer.seekTo(offset);
             }
-            //exoPlayer.setRepeatMode(Player.REPEAT_MODE_OFF);
             exoPlayer.prepare(mediaSource);
-            exoPlayer.setPlayWhenReady(config.autoPlay());
-            if (!config.autoPlay()) {
-                paused = true;
-            }
+
+            exoPlayer.setPlayWhenReady(autoPlay);
+            paused = !autoPlay;
+
             JSONObject payload = Payload.startEvent(exoPlayer, audioFocusString);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
         }
@@ -272,7 +268,7 @@ public class Player {
         }
     }
 
-    private MediaSource getMediaSource(Uri uri) {
+    private MediaSource getMediaSource(Uri uri, DefaultBandwidthMeter bandwidthMeter) {
         String userAgent = Util.getUserAgent(this.activity, config.getUserAgent());
         Handler mainHandler = new Handler();
         int connectTimeout = config.getConnectTimeout();
@@ -344,7 +340,8 @@ public class Player {
 
     public void setStream(Uri uri, JSONObject controller) {
         if (null != uri) {
-            MediaSource mediaSource = getMediaSource(uri);
+            DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+            MediaSource mediaSource = getMediaSource(uri, bandwidthMeter);
             exoPlayer.prepare(mediaSource);
             play();
         }

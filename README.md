@@ -6,6 +6,10 @@ Cordova media player plugin using Google's ExoPlayer framework.
 
 Please send us links to your cool projects made with this plugin so we can include them on this page!
 
+## Changes in version 2.5.3
+- After observing performance issues removing the usage of okhttp.
+- Removing the 'android.hardware.touchscreen' check before adding touch handler. This feature is not reliably reported by various devices. 
+
 ## Changes in version 2.5.2
 - Upgraded exoplayer to version 2.5.1
 - Only adding touchscreen event handler if device has "android.hardware.touchscreen" system feature.
