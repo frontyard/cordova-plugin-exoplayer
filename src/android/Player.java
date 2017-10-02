@@ -89,6 +89,14 @@ public class Player {
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+            int viewId = activity.getResources().getIdentifier("exo_progress", "id", activity.getPackageName());
+            View progressBar = exoView.findViewById(viewId);
+            if (playbackState == ExoPlayer.STATE_BUFFERING) {
+                progressBar.setVisibility(View.VISIBLE);
+            }
+            else {
+                progressBar.setVisibility(View.GONE);
+            }
             JSONObject payload = Payload.stateEvent(Player.this.exoPlayer, playbackState, Player.this.controllerVisibility == View.VISIBLE);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
         }
