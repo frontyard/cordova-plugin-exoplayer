@@ -12,7 +12,7 @@
         <engine name="cordova" version=">=3.4.0"/>
     </engines>
 
-    <asset src="www/ExoPlayer.js" target="js/exoplayer.js"/>
+    <asset src="www/exoplayer.js" target="js/exoplayer.js"/>
 
     <js-module src="www/exoplayer.js" name="ExoPlayer">
         <clobbers target="ExoPlayer"/>
