@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
@@ -9,73 +10,19 @@
     <!-- Control button bar -->
     <LinearLayout
         android:id="@id/exo_buttons"
-        android:layout_width="match_parent"
+        android:background="@color/background_color"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
         android:orientation="horizontal">
 
-        <!--ImageButton android:id="@id/exo_prev"
-                     android:layout_width="80dp"
-                     android:layout_height="80dp"
-                     android:layout_gravity="center"
-                     android:adjustViewBounds="true"
-                     android:scaleType="centerInside"
-                     android:background="#00000000"
-                     style="@style/ExoMediaButton.Previous"/-->
-
-        <ImageButton android:id="@id/exo_rew"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:layout_gravity="center"
-            android:adjustViewBounds="true"
-            android:scaleType="centerInside"
-            android:background="#00000000"
-            style="@style/ExoMediaButton.Rewind"/>
-
-        <ImageButton android:id="@id/exo_play"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:layout_gravity="center"
-            android:adjustViewBounds="true"
-            android:scaleType="centerInside"
-            android:background="#00000000"
-            style="@style/ExoMediaButton.Play"/>
-
-        <ImageButton android:id="@id/exo_pause"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:layout_gravity="center"
-            android:adjustViewBounds="true"
-            android:scaleType="centerInside"
-            android:background="#00000000"
-            style="@style/ExoMediaButton.Pause"/>
-
-        <ImageButton android:id="@id/exo_ffwd"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:layout_gravity="center"
-            android:adjustViewBounds="true"
-            android:scaleType="centerInside"
-            android:background="#00000000"
-            style="@style/ExoMediaButton.FastForward"/>
-
-        <!--ImageButton android:id="@id/exo_next"
-                     android:layout_width="80dp"
-                     android:layout_height="80dp"
-                     android:layout_gravity="center"
-                     android:adjustViewBounds="true"
-                     android:scaleType="centerInside"
-                     android:background="#00000000"
-                     style="@style/ExoMediaButton.Next"/-->
+        <ImageButton android:id="@id/exo_rew" style="@style/Exo.Rewind"/>
+        <ImageButton android:id="@id/exo_play" style="@style/Exo.Play"/>
+        <ImageButton android:id="@id/exo_pause" style="@style/Exo.Pause"/>
+        <ImageButton android:id="@id/exo_ffwd" style="@style/Exo.FastForward"/>
     </LinearLayout>
 
     <!-- Buttom info bar -->
@@ -85,7 +32,7 @@
         android:layout_gravity="bottom"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:background="#CC000000"
+        android:background="@color/background_color"
         android:layout_marginLeft="48dp"
         android:layout_marginBottom="48dp"
         android:layout_marginRight="48dp"
@@ -155,7 +102,9 @@
                     android:id="@id/exo_progress"
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    android:layout_height="26dp"/>
+                    android:layout_height="26dp"
+                    app:played_color="#ff7c4dff"
+                    app:buffered_color="#ffff5722"/>
 
                 <TextView android:id="@id/exo_duration"
                     android:layout_width="wrap_content"

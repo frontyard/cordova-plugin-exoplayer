@@ -89,15 +89,8 @@ public class Player {
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-            int viewId = activity.getResources().getIdentifier("exo_spinner", "id", activity.getPackageName());
-            final View progressBar = exoView.findViewById(viewId);
-            final boolean hide = (playbackState == ExoPlayer.STATE_BUFFERING);
-            if (null != progressBar) {
-//                activity.runOnUiThread(new Runnable() {
-//                    public void run() {
-                        progressBar.setVisibility(hide ? View.VISIBLE : View.GONE);
-//                    }
-//                });
+            if (config.showSpinner()) {
+                LayoutProvider.setSpinnerVisibility(exoView, activity, config, playbackState == ExoPlayer.STATE_BUFFERING);
             }
             JSONObject payload = Payload.stateEvent(Player.this.exoPlayer, playbackState, Player.this.controllerVisibility == View.VISIBLE);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
@@ -233,8 +226,8 @@ public class Player {
 
         dialog.getWindow().setAttributes(LayoutProvider.getDialogLayoutParams(activity, config, dialog));
         exoView.requestFocus();
-            exoView.setOnTouchListener(onTouchListener);
-        LayoutProvider.setupController(exoView, activity, config.getController());
+        exoView.setOnTouchListener(onTouchListener);
+        LayoutProvider.setupController(exoView, activity, config, config.getController());
     }
 
     private int setupAudio() {
@@ -421,7 +414,7 @@ public class Player {
 
     public void setController(JSONObject controller) {
         if (null != exoView) {
-            LayoutProvider.setupController(exoView, activity, controller);
+            LayoutProvider.setupController(exoView, activity, config, controller);
         }
     }
 

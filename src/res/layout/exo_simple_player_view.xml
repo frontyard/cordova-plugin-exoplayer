@@ -22,16 +22,6 @@
 
         <!-- Video surface will be inserted as the first child of the content frame. -->
 
-        <View android:id="@id/exo_shutter"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/black"/>
-
-        <ImageView android:id="@id/exo_artwork"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="fitXY"/>
-
         <com.google.android.exoplayer2.ui.SubtitleView android:id="@id/exo_subtitles"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
@@ -42,16 +32,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <FrameLayout android:id="@id/exo_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
     <ProgressBar android:id="@id/exo_spinner"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
-        android:paddingRight="10dp"
-        android:paddingTop="10dp"
-        android:progressDrawable="@drawable/circular_progress_bar"/>
+        android:layout_margin="10dp"
+        android:padding="5dp"
+        android:indeterminate="true"
+        android:progressDrawable="@layout/exo_spinner_view"/>
 </merge>

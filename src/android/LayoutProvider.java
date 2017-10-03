@@ -58,43 +58,48 @@ public class LayoutProvider {
         view.setControllerHideOnTouch(true);
         view.setControllerShowTimeoutMs(config.getHideTimeout());
 
-        setupController(view, activity, config.getController());
+        setupController(view, activity, config, config.getController());
         return view;
     }
 
-    public static void setupController(SimpleExoPlayerView parentView, Activity activity, JSONObject controller) {
+    public static void setupController(SimpleExoPlayerView parentView, Activity activity, Configuration config, JSONObject controller) {
         if (null != controller) {
             parentView.setUseController(true);
-            setupButtons(parentView, activity, controller);
-            setupBar(parentView, activity, controller);
+            setupButtons(parentView, activity, config, controller);
+            setupBar(parentView, activity, config, controller);
         }
         else {
             parentView.setUseController(false);
         }
     }
 
-    private static void setupButtons(SimpleExoPlayerView parentView, Activity activity, JSONObject controller) {
-        java.lang.String packageName = activity.getPackageName();
+    private static void setupButtons(SimpleExoPlayerView parentView, Activity activity, Configuration config, JSONObject controller) {
+        String packageName = activity.getPackageName();
+        String buttonsColor = config.getButtonsColor();
+
         JSONObject buttonsConfig = controller.optJSONObject("controlIcons");
         if (null != buttonsConfig) {
             for (BUTTON b : BUTTON.values()) {
                 String buttonName = b.name();
-                if (buttonsConfig.has(buttonName)) {
-                    ImageButton imageButton = (ImageButton) findView(parentView, activity, buttonName);
-                    if (null != imageButton) {
+                ImageButton imageButton = (ImageButton) findView(parentView, activity, buttonName);
+                if (null != imageButton) {
+                    if (buttonsConfig.has(buttonName)) {
+                        // Loading from external source.
                         String buttonUrl = buttonsConfig.optString(buttonName);
                         if (null == buttonUrl) {
-                            Log.i(Player.TAG, "Hiding " + buttonName + " button");
                             imageButton.setVisibility(View.GONE);
                         }
                         else {
-                            Log.i(Player.TAG, "Loading " + buttonName + " from " + buttonUrl);
                             Picasso.with(imageButton.getContext()).load(buttonUrl).into(imageButton);
                         }
                     }
-                    else {
-                        Log.e(Player.TAG, "ImageButton " + buttonName + " not found!");
+                    else if (null != buttonsColor) {
+                        // Using default and tinting.
+                        imageButton.setColorFilter(Color.parseColor(buttonsColor));
                     }
+                }
+                else {
+                    Log.e(Player.TAG, "ImageButton " + buttonName + " not found!");
                 }
             }
         }
@@ -104,10 +109,11 @@ public class LayoutProvider {
         }
     }
 
-    private static void setupBar(SimpleExoPlayerView parentView, Activity activity, JSONObject controller) {
+    private static void setupBar(SimpleExoPlayerView parentView, Activity activity, Configuration config, JSONObject controller) {
         String streamTitle = controller.optString("streamTitle", null);
         String streamDescription = controller.optString("streamDescription", null);
         String streamImage = controller.optString("streamImage", null);
+        String textColor = config.getTextColor();
 
         ImageView imageView = (ImageView) findView(parentView, activity, "exo_image");
         TextView titleView = (TextView) findView(parentView, activity, "exo_title");
@@ -116,6 +122,13 @@ public class LayoutProvider {
         TextView positionView = (TextView) findView(timebarView, activity, "exo_position");
         TextView durationView = (TextView) findView(timebarView, activity, "exo_duration");
 
+        if (null != textColor) {
+            int intTextColor = Color.parseColor(textColor);
+            titleView.setTextColor(intTextColor);
+            subtitleView.setTextColor(intTextColor);
+            positionView.setTextColor(intTextColor);
+            durationView.setTextColor(intTextColor);
+        }
         if(null != streamImage) {
             Picasso.with(imageView.getContext()).load(streamImage).into(imageView);
         }
@@ -137,6 +150,17 @@ public class LayoutProvider {
             }
             if (controller.optBoolean("hideDuration")) {
                 durationView.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    public static void setSpinnerVisibility(SimpleExoPlayerView parentView, Activity activity, Configuration config, boolean visibile) {
+        ProgressBar progressBar = (ProgressBar)findView(parentView, activity, "exo_spinner");
+        if (null != progressBar) {
+            progressBar.setVisibility(visibile ? View.VISIBLE : View.GONE);
+            String spinnerColor = config.getSpinnerColor();
+            if (null != spinnerColor) {
+                progressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor(spinnerColor), android.graphics.PorterDuff.Mode.MULTIPLY);
             }
         }
     }
