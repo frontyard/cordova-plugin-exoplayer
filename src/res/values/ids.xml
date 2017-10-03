@@ -5,5 +5,5 @@
     <item name="exo_title" type="id"/>
     <item name="exo_subtitle" type="id"/>
     <item name="exo_timebar" type="id"/>
-    <item name="exo_progress" type="id"/>
+    <item name="exo_spinner" type="id"/>
 </resources>

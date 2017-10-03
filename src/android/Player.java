@@ -89,13 +89,15 @@ public class Player {
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-            int viewId = activity.getResources().getIdentifier("exo_progress", "id", activity.getPackageName());
-            View progressBar = exoView.findViewById(viewId);
-            if (playbackState == ExoPlayer.STATE_BUFFERING) {
-                progressBar.setVisibility(View.VISIBLE);
-            }
-            else {
-                progressBar.setVisibility(View.GONE);
+            int viewId = activity.getResources().getIdentifier("exo_spinner", "id", activity.getPackageName());
+            final View progressBar = exoView.findViewById(viewId);
+            final boolean hide = (playbackState == ExoPlayer.STATE_BUFFERING);
+            if (null != progressBar) {
+//                activity.runOnUiThread(new Runnable() {
+//                    public void run() {
+                        progressBar.setVisibility(hide ? View.VISIBLE : View.GONE);
+                    }
+//                });
             }
             JSONObject payload = Payload.stateEvent(Player.this.exoPlayer, playbackState, Player.this.controllerVisibility == View.VISIBLE);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
