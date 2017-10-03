@@ -96,7 +96,7 @@ public class Player {
 //                activity.runOnUiThread(new Runnable() {
 //                    public void run() {
                         progressBar.setVisibility(hide ? View.VISIBLE : View.GONE);
-                    }
+//                    }
 //                });
             }
             JSONObject payload = Payload.stateEvent(Player.this.exoPlayer, playbackState, Player.this.controllerVisibility == View.VISIBLE);
