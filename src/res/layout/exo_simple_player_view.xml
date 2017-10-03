@@ -33,12 +33,12 @@
         android:layout_height="match_parent"/>
 
     <ProgressBar android:id="@id/exo_spinner"
-        style="?android:attr/progressBarStyle"
+        style="?android:attr/progressBarStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
-        android:layout_margin="10dp"
-        android:padding="5dp"
+        android:layout_margin="12dp"
+        android:padding="6dp"
         android:indeterminate="true"
         android:progressDrawable="@layout/exo_spinner_view"/>
 </merge>
