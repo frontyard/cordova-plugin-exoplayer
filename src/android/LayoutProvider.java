@@ -86,7 +86,7 @@ public class LayoutProvider {
                 if (null != imageButton) {
                     if (buttonsConfig.has(buttonName)) {
                         String buttonUrl = buttonsConfig.optString(buttonName);
-                        if (null == buttonUrl || buttonUrl.equals("null")) { // Again, why is this a String?
+                        if (null == buttonUrl || buttonUrl.equals("null")) { // Again, why is this a String "null"?
                             // Image is set to null, remove it from view.
                             imageButton.setVisibility(View.GONE);
                             ((ViewGroup) imageButton.getParent()).removeView(imageButton);

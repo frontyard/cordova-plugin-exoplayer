@@ -125,12 +125,12 @@ This is what `parameters` look like for the `show` call, most of them are option
         hidePosition: false, // If timebar is visible hide current position from it
         hideDuration: false, // If timebar is visible Hide stream duration from it
         controlIcons: {
-            'exo_rew': 'http://url.to/rew.png',
+            'exo_rew': null, // Set to null to remove the button from the player
             'exo_play': 'http://url.to/play.png',
             'exo_pause': 'http://url.to/pause.png',
-            'exo_ffwd': 'http://url.to/ffwd.png'
+            //'exo_ffwd': null, // Buttons not included in configuration will show up as default ExoPlayer buttons
         },
-        textColor: '#ffff0000', // These colors can be any valid Android colors
+        textColor: '#ffff0000', // These colors can be any valid Android color
         buttonsColor: '#ff00ff00', // This example uses hex values including alpha (first byte)
         spinnerColor: '#ff0000ff' // Alpha of 'ff' makes it 100% opaque
     }
