@@ -58,24 +58,25 @@ public class LayoutProvider {
         view.setControllerHideOnTouch(true);
         view.setControllerShowTimeoutMs(config.getHideTimeout());
 
-        setupController(view, activity, config, config.getController());
+        setupController(view, activity, config.getController());
         return view;
     }
 
-    public static void setupController(SimpleExoPlayerView parentView, Activity activity, Configuration config, JSONObject controller) {
+    public static void setupController(SimpleExoPlayerView parentView, Activity activity, JSONObject controller) {
         if (null != controller) {
             parentView.setUseController(true);
-            setupButtons(parentView, activity, config, controller);
-            setupBar(parentView, activity, config, controller);
+            setupButtons(parentView, activity, controller);
+            setupBar(parentView, activity, controller);
+            setupSpinner(parentView, activity, controller);
         }
         else {
             parentView.setUseController(false);
         }
     }
 
-    private static void setupButtons(SimpleExoPlayerView parentView, Activity activity, Configuration config, JSONObject controller) {
+    private static void setupButtons(SimpleExoPlayerView parentView, Activity activity, JSONObject controller) {
         String packageName = activity.getPackageName();
-        String buttonsColor = config.getButtonsColor();
+        String buttonsColor = controller.optString("buttonsColor");
 
         JSONObject buttonsConfig = controller.optJSONObject("controlIcons");
         if (null != buttonsConfig) {
@@ -84,12 +85,14 @@ public class LayoutProvider {
                 ImageButton imageButton = (ImageButton) findView(parentView, activity, buttonName);
                 if (null != imageButton) {
                     if (buttonsConfig.has(buttonName)) {
-                        // Loading from external source.
                         String buttonUrl = buttonsConfig.optString(buttonName);
-                        if (null == buttonUrl) {
+                        if (null == buttonUrl || buttonUrl.equals("null")) { // Again, why is this a String?
+                            // Image is set to null, remove it from view.
                             imageButton.setVisibility(View.GONE);
+                            ((ViewGroup) imageButton.getParent()).removeView(imageButton);
                         }
                         else {
+                            // Loading from external source.
                             Picasso.with(imageButton.getContext()).load(buttonUrl).into(imageButton);
                         }
                     }
@@ -97,9 +100,6 @@ public class LayoutProvider {
                         // Using default and tinting.
                         imageButton.setColorFilter(Color.parseColor(buttonsColor));
                     }
-                }
-                else {
-                    Log.e(Player.TAG, "ImageButton " + buttonName + " not found!");
                 }
             }
         }
@@ -109,11 +109,11 @@ public class LayoutProvider {
         }
     }
 
-    private static void setupBar(SimpleExoPlayerView parentView, Activity activity, Configuration config, JSONObject controller) {
+    private static void setupBar(SimpleExoPlayerView parentView, Activity activity, JSONObject controller) {
         String streamTitle = controller.optString("streamTitle", null);
         String streamDescription = controller.optString("streamDescription", null);
         String streamImage = controller.optString("streamImage", null);
-        String textColor = config.getTextColor();
+        String textColor = controller.optString("textColor");
 
         ImageView imageView = (ImageView) findView(parentView, activity, "exo_image");
         TextView titleView = (TextView) findView(parentView, activity, "exo_title");
@@ -124,10 +124,18 @@ public class LayoutProvider {
 
         if (null != textColor) {
             int intTextColor = Color.parseColor(textColor);
-            titleView.setTextColor(intTextColor);
-            subtitleView.setTextColor(intTextColor);
-            positionView.setTextColor(intTextColor);
-            durationView.setTextColor(intTextColor);
+            if (null != titleView) {
+                titleView.setTextColor(intTextColor);
+            }
+            if (null != subtitleView) {
+                subtitleView.setTextColor(intTextColor);
+            }
+            if (null != positionView) {
+                positionView.setTextColor(intTextColor);
+            }
+            if (null != durationView) {
+                durationView.setTextColor(intTextColor);
+            }
         }
         if(null != streamImage) {
             Picasso.with(imageView.getContext()).load(streamImage).into(imageView);
@@ -145,23 +153,29 @@ public class LayoutProvider {
             timebarView.setVisibility(View.GONE);
         }
         else {
-            if (controller.optBoolean("hidePosition")) {
+            if (controller.optBoolean("hidePosition") && null != positionView) {
                 positionView.setVisibility(View.GONE);
+                ((ViewGroup) positionView.getParent()).removeView(positionView);
             }
-            if (controller.optBoolean("hideDuration")) {
+            if (controller.optBoolean("hideDuration") && null != durationView) {
                 durationView.setVisibility(View.GONE);
+                ((ViewGroup) durationView.getParent()).removeView(durationView);
             }
         }
     }
 
-    public static void setSpinnerVisibility(SimpleExoPlayerView parentView, Activity activity, Configuration config, boolean visibile) {
+    private static void setupSpinner(SimpleExoPlayerView parentView, Activity activity, JSONObject controller) {
+        String spinnerColor = controller.optString("spinnerColor");
+        ProgressBar progressBar = (ProgressBar)findView(parentView, activity, "exo_spinner");
+        if (null != progressBar && null != spinnerColor) {
+            progressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor(spinnerColor), android.graphics.PorterDuff.Mode.MULTIPLY);
+        }
+    }
+
+    public static void setSpinnerVisibility(SimpleExoPlayerView parentView, Activity activity, boolean visibile) {
         ProgressBar progressBar = (ProgressBar)findView(parentView, activity, "exo_spinner");
         if (null != progressBar) {
             progressBar.setVisibility(visibile ? View.VISIBLE : View.GONE);
-            String spinnerColor = config.getSpinnerColor();
-            if (null != spinnerColor) {
-                progressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor(spinnerColor), android.graphics.PorterDuff.Mode.MULTIPLY);
-            }
         }
     }
 

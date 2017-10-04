@@ -89,8 +89,8 @@ public class Player {
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-            if (config.showSpinner()) {
-                LayoutProvider.setSpinnerVisibility(exoView, activity, config, playbackState == ExoPlayer.STATE_BUFFERING);
+            if (config.getShowSpinner()) {
+                LayoutProvider.setSpinnerVisibility(exoView, activity, playbackState == ExoPlayer.STATE_BUFFERING);
             }
             JSONObject payload = Payload.stateEvent(Player.this.exoPlayer, playbackState, Player.this.controllerVisibility == View.VISIBLE);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
@@ -227,7 +227,7 @@ public class Player {
         dialog.getWindow().setAttributes(LayoutProvider.getDialogLayoutParams(activity, config, dialog));
         exoView.requestFocus();
         exoView.setOnTouchListener(onTouchListener);
-        LayoutProvider.setupController(exoView, activity, config, config.getController());
+        LayoutProvider.setupController(exoView, activity, config.getController());
     }
 
     private int setupAudio() {
@@ -414,7 +414,7 @@ public class Player {
 
     public void setController(JSONObject controller) {
         if (null != exoView) {
-            LayoutProvider.setupController(exoView, activity, config, controller);
+            LayoutProvider.setupController(exoView, activity, controller);
         }
     }
 

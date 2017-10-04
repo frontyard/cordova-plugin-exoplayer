@@ -94,19 +94,7 @@ public class Configuration {
         return config.optInt("retryCount", 10);
     }
 
-    public boolean showSpinner() {
+    public boolean getShowSpinner() {
         return config.optBoolean("showSpinner");
-    }
-
-    public String getSpinnerColor() {
-        return config.optString("spinnerColor", null);
-    }
-
-    public String getTextColor() {
-        return config.optString("textColor", null);
-    }
-
-    public String getButtonsColor() {
-        return config.optString("buttonsColor", null);
     }
 }

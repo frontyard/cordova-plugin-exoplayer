@@ -16,5 +16,7 @@
 <resources>
     <dimen name="button_width">96dp</dimen>
     <dimen name="button_height">96dp</dimen>
+    <dimen name="padding">12dp</dimen>
     <color name="background_color">#cc000000</color>
+    <color name="foreground_color">@android:color/white</color>
 </resources>
