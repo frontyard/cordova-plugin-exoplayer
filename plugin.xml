@@ -9,7 +9,7 @@
     <license>MIT</license>
 
     <engines>
-        <engine name="cordova" version=">=3.4.0"/>
+        <engine name="cordova-android" version=">=4.0.0"/>
     </engines>
 
     <asset src="www/exoplayer.js" target="js/exoplayer.js"/>
