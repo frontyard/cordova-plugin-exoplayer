@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         id="cordova-plugin-exoplayer"
-        version="2.5.2">
+        version="2.5.4">
 
     <name>ExoPlayer</name>
     <description>Cordova Plugin implementing ExoPlayer video/audio player</description>
@@ -35,6 +35,7 @@
         <source-file src="src/res/layout/exo_simple_player_view.xml" target-dir="res/layout/"/>
         <source-file src="src/res/layout/exo_playback_control_view.xml" target-dir="res/layout/"/>
         <source-file src="src/res/layout/exo_spinner_view.xml" target-dir="res/layout/"/>
+        <source-file src="src/res/layout/exo_rounded_corners.xml" target-dir="res/layout/"/>
 
         <source-file src="src/res/drawable/fastforward.png" target-dir="res/drawable/"/>
         <source-file src="src/res/drawable/next.png" target-dir="res/drawable/"/>
