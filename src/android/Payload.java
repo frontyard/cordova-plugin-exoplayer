@@ -131,6 +131,7 @@ public class Payload {
             timeline.getPeriod(i, period);
             map.put("periodDuration" + i, Long.toString(period.getDurationMs()));
             map.put("periodWindowPosition" + i, Long.toString(period.getPositionInWindowMs()));
+            map.put("positionInFirstPeriod" + i, Long.toString(period.getPositionInFirstPeriodMs()));
         }
         addPlayerState(map, player);
         return new JSONObject(map);

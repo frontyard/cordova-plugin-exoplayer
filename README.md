@@ -9,6 +9,8 @@ Please send us links to your cool projects made with this plugin so we can inclu
 ## Changes in version 2.5.4
 - Added loading spinner to the N-E corner that shows up when player is buffering. This needs to be explicitly turned on with `showSpinner` boolean configuration setting.
 - Added ability to change text, buttons and spinner colors using new controller configuration settings `textColor`, `buttonsColor` and `spinnerColor`.
+- Added positionInFirstPeriod to TIMELINE_EVENT.
+- Upgraded exoplayer to 2.6.1.
 
 ## Changes in version 2.5.3
 - After observing performance issues removing the usage of okhttp.
