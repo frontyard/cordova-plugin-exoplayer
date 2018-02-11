@@ -107,9 +107,10 @@ public class Payload {
         return new JSONObject(map);
     }
 
-    public static JSONObject positionDiscontinuityEvent(ExoPlayer player) {
+    public static JSONObject positionDiscontinuityEvent(ExoPlayer player, int reason) {
         Map<String, String> map = new HashMap<String, String>();
         map.put("eventType", "POSITION_DISCONTINUITY_EVENT");
+        map.put("reason", Integer.toString(reason));
         addPlayerState(map, player);
         return new JSONObject(map);
     }
@@ -131,8 +132,13 @@ public class Payload {
             timeline.getPeriod(i, period);
             map.put("periodDuration" + i, Long.toString(period.getDurationMs()));
             map.put("periodWindowPosition" + i, Long.toString(period.getPositionInWindowMs()));
-            map.put("positionInFirstPeriod" + i, Long.toString(period.getPositionInFirstPeriodMs()));
         }
+        int firstWindow = timeline.getFirstWindowIndex(false);
+        if (firstWindow > -1) {
+            Timeline.Window window = new Timeline.Window();
+            timeline.getWindow(firstWindow, window);
+            map.put("positionInFirstPeriod", Long.toString(window.getPositionInFirstPeriodMs()));
+        }        
         addPlayerState(map, player);
         return new JSONObject(map);
     }
