@@ -19,4 +19,5 @@
     <dimen name="padding">12dp</dimen>
     <color name="background_color">#cc000000</color>
     <color name="foreground_color">@android:color/white</color>
+    <color name="accent_color">#3399CC</color>
 </resources>

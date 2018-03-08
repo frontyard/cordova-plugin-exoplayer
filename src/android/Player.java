@@ -89,8 +89,8 @@ public class Player {
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-            if (config.getShowSpinner()) {
-                LayoutProvider.setSpinnerVisibility(exoView, activity, playbackState == ExoPlayer.STATE_BUFFERING);
+            if (config.getShowBuffering()) {
+                LayoutProvider.setBufferingVisibility(exoView, activity, playbackState == ExoPlayer.STATE_BUFFERING);
             }
             JSONObject payload = Payload.stateEvent(Player.this.exoPlayer, playbackState, Player.this.controllerVisibility == View.VISIBLE);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);

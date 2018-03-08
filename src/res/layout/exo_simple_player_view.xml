@@ -44,14 +44,13 @@
         android:layout_height="match_parent"/>
 
     <ProgressBar
-        android:id="@id/exo_spinner"
-        style="?android:attr/progressBarStyle"
-        android:background="@layout/exo_rounded_corners"
-        android:layout_width="wrap_content"
+        android:id="@+id/exo_buffering"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:layout_margin="12dp"
-        android:padding="8dp"
-        android:indeterminate="true"
-        android:progressDrawable="@layout/exo_spinner_view"/>
+        android:layout_gravity="top"
+        android:max="100"
+        android:indeterminateTint="@color/accent_color"
+        android:indeterminateTintMode="src_in"
+        android:indeterminate="true"/>
 </merge>

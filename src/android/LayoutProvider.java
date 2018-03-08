@@ -67,7 +67,7 @@ public class LayoutProvider {
             parentView.setUseController(true);
             setupButtons(parentView, activity, controller);
             setupBar(parentView, activity, controller);
-            setupSpinner(parentView, activity, controller);
+            setupBuffering(parentView, activity, controller);
         }
         else {
             parentView.setUseController(false);
@@ -164,16 +164,16 @@ public class LayoutProvider {
         }
     }
 
-    private static void setupSpinner(SimpleExoPlayerView parentView, Activity activity, JSONObject controller) {
-        String spinnerColor = controller.optString("spinnerColor");
-        ProgressBar progressBar = (ProgressBar)findView(parentView, activity, "exo_spinner");
-        if (null != progressBar && null != spinnerColor) {
-            progressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor(spinnerColor), android.graphics.PorterDuff.Mode.MULTIPLY);
+    private static void setupBuffering(SimpleExoPlayerView parentView, Activity activity, JSONObject controller) {
+        String bufferingColor = controller.optString("bufferingColor");
+        ProgressBar bufferingBar = (ProgressBar)findView(parentView, activity, "exo_buffering");
+        if (null != bufferingBar && null != bufferingColor) {
+            bufferingBar.getIndeterminateDrawable().setColorFilter(Color.parseColor(bufferingColor), android.graphics.PorterDuff.Mode.MULTIPLY);
         }
     }
 
-    public static void setSpinnerVisibility(SimpleExoPlayerView parentView, Activity activity, boolean visibile) {
-        ProgressBar progressBar = (ProgressBar)findView(parentView, activity, "exo_spinner");
+    public static void setBufferingVisibility(SimpleExoPlayerView parentView, Activity activity, boolean visibile) {
+        ProgressBar progressBar = (ProgressBar)findView(parentView, activity, "exo_buffering");
         if (null != progressBar) {
             progressBar.setVisibility(visibile ? View.VISIBLE : View.GONE);
         }

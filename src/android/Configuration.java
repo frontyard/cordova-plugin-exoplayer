@@ -94,7 +94,7 @@ public class Configuration {
         return config.optInt("retryCount", 10);
     }
 
-    public boolean getShowSpinner() {
-        return config.optBoolean("showSpinner");
+    public boolean getShowBuffering() {
+        return config.optBoolean("showBuffering");
     }
 }

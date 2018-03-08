@@ -7,8 +7,8 @@ Cordova media player plugin using Google's ExoPlayer framework.
 Please send us links to your cool projects made with this plugin so we can include them on this page!
 
 ## Changes in version 2.5.4
-- Added loading spinner to the N-E corner that shows up when player is buffering. This needs to be explicitly turned on with `showSpinner` boolean configuration setting.
-- Added ability to change text, buttons and spinner colors using new controller configuration settings `textColor`, `buttonsColor` and `spinnerColor`.
+- Added loading progress bar to the top that shows up when player is buffering. This needs to be explicitly turned on with `showBuffering` boolean configuration setting.
+- Added ability to change text, buttons and buffering colors using new controller configuration settings `textColor`, `buttonsColor` and `bufferingColor`.
 - Added positionInFirstPeriod to TIMELINE_EVENT.
 - Upgraded exoplayer to 2.6.1.
 
@@ -118,7 +118,7 @@ This is what `parameters` look like for the `show` call, most of them are option
     connectTimeout: 1000, // http connect timeout in ms (default is 0)
     readTimeout: 1000, // http read timeout in ms (default is 0)
     retryCount: 5, // Number of times datasource will retry the stream before giving up (default is 3)
-    showSpinner: true, // Player will show spinner in NE corner when buffering, default is false
+    showBuffering: true, // Player will show buffering indicator in to corner when buffering, default is false
     controller: { // If this object is not present controller will not be visible
         streamImage: 'http://url.to/channel.png',
         streamTitle: 'Cool channel / movie',
@@ -134,7 +134,7 @@ This is what `parameters` look like for the `show` call, most of them are option
         },
         textColor: '#ffff0000', // These colors can be any valid Android color
         buttonsColor: '#ff00ff00', // This example uses hex values including alpha (first byte)
-        spinnerColor: '#ff0000ff' // Alpha of 'ff' makes it 100% opaque
+        bufferingColor: '#ff0000ff' // Alpha of 'ff' makes it 100% opaque
     }
 }
 ```
