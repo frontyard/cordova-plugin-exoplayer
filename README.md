@@ -217,7 +217,7 @@ Run the code
 
 ## IONIC
 
-For examples of using this plugin in an [IONIC](https://ionicframework.com/) app please see [this thread](https://github.com/frontyard/cordova-plugin-exoplayer/issues/4#issuecomment-376118310).
+For examples of using this plugin in an [IONIC](https://ionicframework.com/) app please see [this thread](https://github.com/frontyard/cordova-plugin-exoplayer/issues/4).
 
 For IONIC Native see [npm module](https://www.npmjs.com/package/@ionic-native/android-exoplayer).
 
@@ -238,6 +238,7 @@ General ExoPlayer [documentation](https://google.github.io/ExoPlayer/)
 
 ExoPlayer [source code](https://github.com/google/ExoPlayer)
 https://github.com/frontyard/cordova-plugin-exoplayer
+
 ## Donation
 If this project helps you consider donating to support it!
 
