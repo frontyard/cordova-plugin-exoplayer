@@ -214,7 +214,13 @@ Install Android platform
 Run the code
 
     cordova run
-    
+
+## IONIC
+
+For examples of using this plugin in an [IONIC](https://ionicframework.com/) app please see [this thread](https://github.com/frontyard/cordova-plugin-exoplayer/issues/4#issuecomment-376118310).
+
+For IONIC Native see [npm module](https://www.npmjs.com/package/@ionic-native/android-exoplayer).
+
 ## Contributing
     
 1. Fork it
