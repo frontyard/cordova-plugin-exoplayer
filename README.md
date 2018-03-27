@@ -248,7 +248,7 @@ If this project helps you consider donating to support it!
 
  The MIT License (MIT)
 
- Copyright (c) 2017 Nedim Cholich
+ Copyright (c) 2017-2018 Nedim Cholich
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
