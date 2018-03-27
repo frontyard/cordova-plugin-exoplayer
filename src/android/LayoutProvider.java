@@ -67,6 +67,7 @@ public class LayoutProvider {
             parentView.setUseController(true);
             setupButtons(parentView, activity, controller);
             setupBar(parentView, activity, controller);
+            setupBuffering(parentView, activity, controller);
         }
         else {
             parentView.setUseController(false);
@@ -74,26 +75,30 @@ public class LayoutProvider {
     }
 
     private static void setupButtons(SimpleExoPlayerView parentView, Activity activity, JSONObject controller) {
-        java.lang.String packageName = activity.getPackageName();
+        String packageName = activity.getPackageName();
+        String buttonsColor = controller.optString("buttonsColor");
+
         JSONObject buttonsConfig = controller.optJSONObject("controlIcons");
         if (null != buttonsConfig) {
             for (BUTTON b : BUTTON.values()) {
                 String buttonName = b.name();
-                if (buttonsConfig.has(buttonName)) {
-                    ImageButton imageButton = (ImageButton) findView(parentView, activity, buttonName);
-                    if (null != imageButton) {
+                ImageButton imageButton = (ImageButton) findView(parentView, activity, buttonName);
+                if (null != imageButton) {
+                    if (buttonsConfig.has(buttonName)) {
                         String buttonUrl = buttonsConfig.optString(buttonName);
-                        if (null == buttonUrl) {
-                            Log.i(Player.TAG, "Hiding " + buttonName + " button");
+                        if (null == buttonUrl || buttonUrl.equals("null")) { // Again, why is this a String "null"?
+                            // Image is set to null, remove it from view.
                             imageButton.setVisibility(View.GONE);
+                            ((ViewGroup) imageButton.getParent()).removeView(imageButton);
                         }
                         else {
-                            Log.i(Player.TAG, "Loading " + buttonName + " from " + buttonUrl);
+                            // Loading from external source.
                             Picasso.with(imageButton.getContext()).load(buttonUrl).into(imageButton);
                         }
                     }
-                    else {
-                        Log.e(Player.TAG, "ImageButton " + buttonName + " not found!");
+                    else if (null != buttonsColor) {
+                        // Using default and tinting.
+                        imageButton.setColorFilter(Color.parseColor(buttonsColor));
                     }
                 }
             }
@@ -108,6 +113,7 @@ public class LayoutProvider {
         String streamTitle = controller.optString("streamTitle", null);
         String streamDescription = controller.optString("streamDescription", null);
         String streamImage = controller.optString("streamImage", null);
+        String textColor = controller.optString("textColor");
 
         ImageView imageView = (ImageView) findView(parentView, activity, "exo_image");
         TextView titleView = (TextView) findView(parentView, activity, "exo_title");
@@ -116,6 +122,21 @@ public class LayoutProvider {
         TextView positionView = (TextView) findView(timebarView, activity, "exo_position");
         TextView durationView = (TextView) findView(timebarView, activity, "exo_duration");
 
+        if (null != textColor) {
+            int intTextColor = Color.parseColor(textColor);
+            if (null != titleView) {
+                titleView.setTextColor(intTextColor);
+            }
+            if (null != subtitleView) {
+                subtitleView.setTextColor(intTextColor);
+            }
+            if (null != positionView) {
+                positionView.setTextColor(intTextColor);
+            }
+            if (null != durationView) {
+                durationView.setTextColor(intTextColor);
+            }
+        }
         if(null != streamImage) {
             Picasso.with(imageView.getContext()).load(streamImage).into(imageView);
         }
@@ -132,12 +153,29 @@ public class LayoutProvider {
             timebarView.setVisibility(View.GONE);
         }
         else {
-            if (controller.optBoolean("hidePosition")) {
+            if (controller.optBoolean("hidePosition") && null != positionView) {
                 positionView.setVisibility(View.GONE);
+                ((ViewGroup) positionView.getParent()).removeView(positionView);
             }
-            if (controller.optBoolean("hideDuration")) {
+            if (controller.optBoolean("hideDuration") && null != durationView) {
                 durationView.setVisibility(View.GONE);
+                ((ViewGroup) durationView.getParent()).removeView(durationView);
             }
+        }
+    }
+
+    private static void setupBuffering(SimpleExoPlayerView parentView, Activity activity, JSONObject controller) {
+        String bufferingColor = controller.optString("bufferingColor");
+        ProgressBar bufferingBar = (ProgressBar)findView(parentView, activity, "exo_buffering");
+        if (null != bufferingBar && null != bufferingColor) {
+            bufferingBar.getIndeterminateDrawable().setColorFilter(Color.parseColor(bufferingColor), android.graphics.PorterDuff.Mode.MULTIPLY);
+        }
+    }
+
+    public static void setBufferingVisibility(SimpleExoPlayerView parentView, Activity activity, boolean visibile) {
+        ProgressBar progressBar = (ProgressBar)findView(parentView, activity, "exo_buffering");
+        if (null != progressBar) {
+            progressBar.setVisibility(visibile ? View.VISIBLE : View.GONE);
         }
     }
 

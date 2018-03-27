@@ -93,4 +93,8 @@ public class Configuration {
     public int getRetryCount() {
         return config.optInt("retryCount", 10);
     }
+
+    public boolean getShowBuffering() {
+        return config.optBoolean("showBuffering");
+    }
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         id="cordova-plugin-exoplayer"
-        version="2.5.2">
+        version="2.5.4">
 
     <name>ExoPlayer</name>
     <description>Cordova Plugin implementing ExoPlayer video/audio player</description>
@@ -9,7 +9,7 @@
     <license>MIT</license>
 
     <engines>
-        <engine name="cordova" version=">=3.4.0"/>
+        <engine name="cordova-android" version=">=4.0.0"/>
     </engines>
 
     <asset src="www/exoplayer.js" target="js/exoplayer.js"/>
@@ -19,7 +19,7 @@
     </js-module>
 
     <platform name="android">
-        <framework src="com.google.android.exoplayer:exoplayer:r2.5.1"/>
+        <framework src="com.google.android.exoplayer:exoplayer:2.6.1"/>
         <framework src="com.squareup.picasso:picasso:2.5.2"/>
 
         <config-file target="res/xml/config.xml" parent="/*">
@@ -29,8 +29,19 @@
         </config-file>
 
         <source-file src="src/res/values/ids.xml" target-dir="res/values/"/>
+        <source-file src="src/res/values/constants.xml" target-dir="res/values/"/>
+        <source-file src="src/res/values/styles.xml" target-dir="res/values/"/>
+
         <source-file src="src/res/layout/exo_simple_player_view.xml" target-dir="res/layout/"/>
         <source-file src="src/res/layout/exo_playback_control_view.xml" target-dir="res/layout/"/>
+        <source-file src="src/res/layout/exo_rounded_corners.xml" target-dir="res/layout/"/>
+
+        <source-file src="src/res/drawable/fastforward.png" target-dir="res/drawable/"/>
+        <source-file src="src/res/drawable/next.png" target-dir="res/drawable/"/>
+        <source-file src="src/res/drawable/pause.png" target-dir="res/drawable/"/>
+        <source-file src="src/res/drawable/play.png" target-dir="res/drawable/"/>
+        <source-file src="src/res/drawable/previous.png" target-dir="res/drawable/"/>
+        <source-file src="src/res/drawable/rewind.png" target-dir="res/drawable/"/>
 
         <source-file src="src/android/CallbackResponse.java" target-dir="src/co/frontyard/cordova/plugin/exoplayer/"/>
         <source-file src="src/android/Configuration.java" target-dir="src/co/frontyard/cordova/plugin/exoplayer/"/>

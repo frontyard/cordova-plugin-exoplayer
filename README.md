@@ -6,6 +6,12 @@ Cordova media player plugin using Google's ExoPlayer framework.
 
 Please send us links to your cool projects made with this plugin so we can include them on this page!
 
+## Changes in version 2.5.4
+- Added loading progress bar to the top that shows up when player is buffering. This needs to be explicitly turned on with `showBuffering` boolean configuration setting.
+- Added ability to change text, buttons and buffering colors using new controller configuration settings `textColor`, `buttonsColor` and `bufferingColor`.
+- Added positionInFirstPeriod to TIMELINE_EVENT.
+- Upgraded exoplayer to 2.6.1.
+
 ## Changes in version 2.5.3
 - After observing performance issues removing the usage of okhttp.
 - Removing the 'android.hardware.touchscreen' check before adding touch handler. This feature is not reliably reported by various devices. 
@@ -109,11 +115,10 @@ This is what `parameters` look like for the `show` call, most of them are option
     rewindTime: 60 * 1000, // Amount of time in ms to use when skipping backward, default is 1 min
     audioOnly: true, // Only play audio in the backgroud, default is false.
     subtitleUrl: 'http://url.to/subtitle.srt', // Optional subtitle url
-    connectTimeout: 1000, // okhttp connect timeout in ms (default is 0)
-    readTimeout: 1000, // okhttp read timeout in ms (default is 0)
-    writeTimeout: 1000, // okhttp write timeout in ms (default is 0)
-    pingInterval: 1000, // okhttp socket ping interval in ms (default is 0 or disabled)
-    retryCount: 5, // number of times datasource will retry the stream before giving up (default is 3)
+    connectTimeout: 1000, // http connect timeout in ms (default is 0)
+    readTimeout: 1000, // http read timeout in ms (default is 0)
+    retryCount: 5, // Number of times datasource will retry the stream before giving up (default is 3)
+    showBuffering: true, // Player will show buffering indicator in to corner when buffering, default is false
     controller: { // If this object is not present controller will not be visible
         streamImage: 'http://url.to/channel.png',
         streamTitle: 'Cool channel / movie',
@@ -122,11 +127,14 @@ This is what `parameters` look like for the `show` call, most of them are option
         hidePosition: false, // If timebar is visible hide current position from it
         hideDuration: false, // If timebar is visible Hide stream duration from it
         controlIcons: {
-            'exo_rew': 'http://url.to/rew.png',
+            'exo_rew': null, // Set to null to remove the button from the player
             'exo_play': 'http://url.to/play.png',
             'exo_pause': 'http://url.to/pause.png',
-            'exo_ffwd': 'http://url.to/ffwd.png'
-        }
+            //'exo_ffwd': null, // Buttons not included in configuration will show up as default ExoPlayer buttons
+        },
+        textColor: '#ffff0000', // These colors can be any valid Android color
+        buttonsColor: '#ff00ff00', // This example uses hex values including alpha (first byte)
+        bufferingColor: '#ff0000ff' // Alpha of 'ff' makes it 100% opaque
     }
 }
 ```

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
@@ -9,73 +10,24 @@
     <!-- Control button bar -->
     <LinearLayout
         android:id="@id/exo_buttons"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="horizontal">
 
-        <!--ImageButton android:id="@id/exo_prev"
-                     android:layout_width="80dp"
-                     android:layout_height="80dp"
-                     android:layout_gravity="center"
-                     android:adjustViewBounds="true"
-                     android:scaleType="centerInside"
-                     android:background="#00000000"
-                     style="@style/ExoMediaButton.Previous"/-->
-
         <ImageButton android:id="@id/exo_rew"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:layout_gravity="center"
-            android:adjustViewBounds="true"
-            android:scaleType="centerInside"
-            android:background="#00000000"
-            style="@style/ExoMediaButton.Rewind"/>
-
+            android:background="@layout/exo_rounded_corners"
+            style="@style/Exo.Rewind"/>
         <ImageButton android:id="@id/exo_play"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:layout_gravity="center"
-            android:adjustViewBounds="true"
-            android:scaleType="centerInside"
-            android:background="#00000000"
-            style="@style/ExoMediaButton.Play"/>
-
+            android:background="@layout/exo_rounded_corners"
+            style="@style/Exo.Play"/>
         <ImageButton android:id="@id/exo_pause"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:layout_gravity="center"
-            android:adjustViewBounds="true"
-            android:scaleType="centerInside"
-            android:background="#00000000"
-            style="@style/ExoMediaButton.Pause"/>
-
+            android:background="@layout/exo_rounded_corners"
+            style="@style/Exo.Pause"/>
         <ImageButton android:id="@id/exo_ffwd"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:layout_gravity="center"
-            android:adjustViewBounds="true"
-            android:scaleType="centerInside"
-            android:background="#00000000"
-            style="@style/ExoMediaButton.FastForward"/>
-
-        <!--ImageButton android:id="@id/exo_next"
-                     android:layout_width="80dp"
-                     android:layout_height="80dp"
-                     android:layout_gravity="center"
-                     android:adjustViewBounds="true"
-                     android:scaleType="centerInside"
-                     android:background="#00000000"
-                     style="@style/ExoMediaButton.Next"/-->
+            android:background="@layout/exo_rounded_corners"
+            style="@style/Exo.FastForward"/>
     </LinearLayout>
 
     <!-- Buttom info bar -->
@@ -85,21 +37,21 @@
         android:layout_gravity="bottom"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:background="#CC000000"
+        android:background="@layout/exo_rounded_corners"
         android:layout_marginLeft="48dp"
         android:layout_marginBottom="48dp"
         android:layout_marginRight="48dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp">
+        android:paddingTop="@dimen/padding"
+        android:paddingBottom="@dimen/padding"
+        android:paddingLeft="@dimen/padding"
+        android:paddingRight="@dimen/padding">
 
         <!-- Left -->
         <ImageView android:id="@id/exo_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:maxHeight="80dp"
+            android:maxHeight="86dp"
             android:maxWidth="144dp"
             android:adjustViewBounds="true"
             android:scaleType="centerInside"/>
@@ -110,7 +62,7 @@
             android:layout_gravity="bottom"
             android:gravity="center_vertical"
             android:orientation="vertical"
-            android:paddingLeft="8dp">
+            android:paddingLeft="@dimen/padding">
 
             <!-- First line -->
             <TextView android:id="@id/exo_title"
@@ -118,10 +70,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical"
-                android:textSize="26dp"
+                android:textSize="28dp"
                 android:textStyle="bold"
                 android:includeFontPadding="false"
-                android:textColor="#FFBEBEBE"/>
+                android:textColor="@color/foreground_color"/>
 
             <!-- Second line -->
             <TextView android:id="@id/exo_subtitle"
@@ -132,13 +84,13 @@
                 android:textSize="20dp"
                 android:textStyle="bold"
                 android:includeFontPadding="false"
-                android:textColor="#FFBEBEBE"/>
+                android:textColor="@color/foreground_color"/>
 
             <!-- Third line -->
             <LinearLayout android:id="@id/exo_timebar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="4dp"
+                android:paddingTop="8dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -147,24 +99,26 @@
                     android:layout_height="wrap_content"
                     android:textSize="20dp"
                     android:textStyle="bold"
-                    android:paddingRight="6dp"
+                    android:paddingRight="8dp"
                     android:includeFontPadding="false"
-                    android:textColor="#FFBEBEBE"/>
+                    android:textColor="@color/foreground_color"/>
 
                 <com.google.android.exoplayer2.ui.DefaultTimeBar
                     android:id="@id/exo_progress"
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    android:layout_height="26dp"/>
+                    android:layout_height="26dp"
+                    app:played_color="@color/foreground_color"
+                    app:buffered_color="#FFBEBEBE"/>
 
                 <TextView android:id="@id/exo_duration"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="20dp"
                     android:textStyle="bold"
-                    android:paddingLeft="6dp"
+                    android:paddingLeft="8dp"
                     android:includeFontPadding="false"
-                    android:textColor="#FFBEBEBE"/>
+                    android:textColor="@color/foreground_color"/>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

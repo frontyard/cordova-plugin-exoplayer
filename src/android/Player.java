@@ -71,6 +71,12 @@ public class Player {
 
     private ExoPlayer.EventListener playerEventListener = new ExoPlayer.EventListener() {
         @Override
+        public void onLoadingChanged(boolean isLoading) {
+            JSONObject payload = Payload.loadingEvent(Player.this.exoPlayer, isLoading);
+            new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
+        }
+
+        @Override
         public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
             Log.i(TAG, "Playback parameters changed");
         }
@@ -82,21 +88,31 @@ public class Player {
         }
 
         @Override
-        public void onLoadingChanged(boolean isLoading) {
-            JSONObject payload = Payload.loadingEvent(Player.this.exoPlayer, isLoading);
-            new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
-        }
-
-        @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+            if (config.getShowBuffering()) {
+                LayoutProvider.setBufferingVisibility(exoView, activity, playbackState == ExoPlayer.STATE_BUFFERING);
+            }
             JSONObject payload = Payload.stateEvent(Player.this.exoPlayer, playbackState, Player.this.controllerVisibility == View.VISIBLE);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
         }
 
         @Override
-        public void onPositionDiscontinuity() {
-            JSONObject payload = Payload.positionDiscontinuityEvent(Player.this.exoPlayer);
+        public void onPositionDiscontinuity(int reason) {
+            JSONObject payload = Payload.positionDiscontinuityEvent(Player.this.exoPlayer, reason);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
+        }
+
+        @Override
+        public void onRepeatModeChanged(int newRepeatMode) {
+            // Need to see if we want to send this to Cordova.
+        }
+    
+        @Override
+        public void onSeekProcessed() {
+        }
+
+        @Override
+        public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
         }
 
         @Override
@@ -107,11 +123,6 @@ public class Player {
 
         @Override
         public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-            // Need to see if we want to send this to Cordova.
-        }
-
-        @Override
-        public void onRepeatModeChanged(int newRepeatMode) {
             // Need to see if we want to send this to Cordova.
         }
     };
@@ -223,7 +234,7 @@ public class Player {
 
         dialog.getWindow().setAttributes(LayoutProvider.getDialogLayoutParams(activity, config, dialog));
         exoView.requestFocus();
-            exoView.setOnTouchListener(onTouchListener);
+        exoView.setOnTouchListener(onTouchListener);
         LayoutProvider.setupController(exoView, activity, config.getController());
     }
 
@@ -419,5 +430,5 @@ public class Player {
         Log.e(TAG, msg);
         JSONObject payload = Payload.playerErrorEvent(Player.this.exoPlayer, null, msg);
         new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.ERROR, payload, true);
-    }
+    }   
 }
