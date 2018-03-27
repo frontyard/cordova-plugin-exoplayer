@@ -113,12 +113,12 @@ This is what `parameters` look like for the `show` call, most of them are option
     seekTo: 10 * 60 * 60 * 1000, // Start playback 10 minutes into video specified in ms, default is 0
     forwardTime: 60 * 1000, // Amount of time in ms to use when skipping forward, default is 1 min
     rewindTime: 60 * 1000, // Amount of time in ms to use when skipping backward, default is 1 min
-    audioOnly: true, // Only play audio in the backgroud, default is false.
+    audioOnly: true, // Only play audio in the backgroud, default is false
     subtitleUrl: 'http://url.to/subtitle.srt', // Optional subtitle url
     connectTimeout: 1000, // http connect timeout in ms (default is 0)
     readTimeout: 1000, // http read timeout in ms (default is 0)
     retryCount: 5, // Number of times datasource will retry the stream before giving up (default is 3)
-    showBuffering: true, // Player will show buffering indicator in to corner when buffering, default is false
+    showBuffering: true, // When buffering, player will show indicator at the top of the screen, default is false
     controller: { // If this object is not present controller will not be visible
         streamImage: 'http://url.to/channel.png',
         streamTitle: 'Cool channel / movie',
@@ -231,8 +231,32 @@ For more info on plugins see the [Plugin Development Guide](http://cordova.apach
 General ExoPlayer [documentation](https://google.github.io/ExoPlayer/)
 
 ExoPlayer [source code](https://github.com/google/ExoPlayer)
-
+https://github.com/frontyard/cordova-plugin-exoplayer
 ## Donation
 If this project helps you consider donating to support it!
 
 [![paypal](https://cdn.rawgit.com/twolfson/paypal-github-button/1.0.0/dist/button.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2ZPEB7VKFG2CY)
+
+## License
+
+ The MIT License (MIT)
+
+ Copyright (c) 2017 Nedim Cholich
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
