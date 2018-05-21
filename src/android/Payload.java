@@ -98,12 +98,13 @@ public class Payload {
         return new JSONObject(map);
     }
 
-    public static JSONObject stateEvent(ExoPlayer player, int playbackState, boolean controllerVisible) {
+    public static JSONObject stateEvent(ExoPlayer player, int playbackState, boolean controllerVisible, boolean paused) {
         Map<String, String> map = new HashMap<String, String>();
         map.put("eventType", "STATE_CHANGED_EVENT");
         addPlayerState(map, player);
         map.put("playbackState", playbackStateToString(playbackState));
         map.put("controllerVisible", Boolean.toString(controllerVisible));
+        map.put("paused", Boolean.toString(paused));
         return new JSONObject(map);
     }
 
