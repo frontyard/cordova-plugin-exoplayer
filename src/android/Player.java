@@ -92,8 +92,7 @@ public class Player {
             if (config.getShowBuffering()) {
                 LayoutProvider.setBufferingVisibility(exoView, activity, playbackState == ExoPlayer.STATE_BUFFERING);
             }
-            JSONObject payload = Payload.stateEvent(Player.this.exoPlayer, playbackState,
-                Player.this.controllerVisibility == View.VISIBLE, paused);
+            JSONObject payload = Payload.stateEvent(Player.this.exoPlayer, playbackState, Player.this.controllerVisibility == View.VISIBLE);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
         }
 
@@ -408,8 +407,7 @@ public class Player {
     public JSONObject getPlayerState() {
         return Payload.stateEvent(exoPlayer,
                 null != exoPlayer ? exoPlayer.getPlaybackState() : SimpleExoPlayer.STATE_ENDED,
-                Player.this.controllerVisibility == View.VISIBLE,
-                paused);
+                Player.this.controllerVisibility == View.VISIBLE);
     }
 
     public void showController() {
