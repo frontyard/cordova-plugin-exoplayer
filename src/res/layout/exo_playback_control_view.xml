@@ -17,16 +17,12 @@
         android:orientation="horizontal">
 
         <ImageButton android:id="@id/exo_rew"
-            android:background="@layout/exo_rounded_corners"
             style="@style/Exo.Rewind"/>
         <ImageButton android:id="@id/exo_play"
-            android:background="@layout/exo_rounded_corners"
             style="@style/Exo.Play"/>
         <ImageButton android:id="@id/exo_pause"
-            android:background="@layout/exo_rounded_corners"
             style="@style/Exo.Pause"/>
         <ImageButton android:id="@id/exo_ffwd"
-            android:background="@layout/exo_rounded_corners"
             style="@style/Exo.FastForward"/>
     </LinearLayout>
 
