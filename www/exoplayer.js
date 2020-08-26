@@ -55,5 +55,16 @@ module.exports = {
     },
     close: function (successCallback, errorCallback) {
         cordova.exec(successCallback, errorCallback, "ExoPlayer", "close", []);
+    },
+    setWebViewVisibility: function (parameters, successCallback, errorCallback) {
+        cordova.exec(successCallback, errorCallback, "ExoPlayer", "setWebViewVisibility", [parameters]);
+    },
+    webViewVisibility: {
+        VISIBLE: "VISIBLE",
+        INVISIBLE: "INVISIBLE",
+        GONE: "GONE"
+    },
+    setWebViewBackgroundColor: function (parameters, successCallback, errorCallback) {
+        cordova.exec(successCallback, errorCallback, "ExoPlayer", "setWebViewBackgroundColor", [parameters]);
     }
 };

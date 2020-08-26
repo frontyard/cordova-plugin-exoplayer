@@ -6,6 +6,11 @@ Cordova media player plugin using Google's ExoPlayer framework.
 
 Please send us links to your cool projects made with this plugin so we can include them on this page!
 
+## Changes in version 2.5.6
+- Added ability to run ExoPlayer behind the Cordova WebView.
+
+- Upgraded exoplayer to 2.7.2.
+
 ## Changes in version 2.5.4
 - Added loading progress bar to the top that shows up when player is buffering. This needs to be explicitly turned on with `showBuffering` boolean configuration setting.
 - Added ability to change text, buttons and buffering colors using new controller configuration settings `textColor`, `buttonsColor` and `bufferingColor`.

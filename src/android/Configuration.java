@@ -54,6 +54,10 @@ public class Configuration {
         return config.optBoolean("audioOnly");
     }
 
+    public boolean isRunBehindWebViewMode() {
+        return config.optBoolean("runBehindWebView");
+    }
+
     public boolean autoPlay() {
         return config.optBoolean("autoPlay", true);
     }
