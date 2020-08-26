@@ -26,6 +26,9 @@ module.exports = {
     show: function (parameters, successCallback, errorCallback) {
         cordova.exec(successCallback, errorCallback, "ExoPlayer", "show", [parameters]);
     },
+    toggleWebViewVisibility: function (parameters, successCallback, errorCallback) {
+        cordova.exec(successCallback, errorCallback, "ExoPlayer", "toggleWebViewVisibility", [parameters]);
+    },
     setStream: function (url, controller, successCallback, errorCallback) {
         cordova.exec(successCallback, errorCallback, "ExoPlayer", "setStream", [url, controller]);
     },

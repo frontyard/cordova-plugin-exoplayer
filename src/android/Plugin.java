@@ -23,13 +23,16 @@
  */
 package co.frontyard.cordova.plugin.exoplayer;
 
+import android.graphics.Color;
 import android.net.*;
+import android.view.View;
 import android.view.ViewGroup;
 import org.apache.cordova.*;
 import org.json.*;
 
 public class Plugin extends CordovaPlugin {
     private Player player;
+    private boolean webViewVisibilityToggle = true;
 
     @Override
     public boolean execute(final String action, final JSONArray data, final CallbackContext callbackContext) throws JSONException {
@@ -43,7 +46,19 @@ public class Plugin extends CordovaPlugin {
                         }
                         JSONObject params = data.optJSONObject(0);
                         self.player = new Player(new Configuration(params), cordova.getActivity(), callbackContext, webView);
-                        self.player.createPlayer();
+                        self.player.createPlayer(webView);
+                        new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
+                    }
+                });
+                return true;
+            }
+            else if (action.equals("toggleWebViewVisibility")) {
+                cordova.getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        JSONObject params = data.optJSONObject(0);
+                        Configuration conf = new Configuration(params);
+                        webView.getView().setVisibility( webViewVisibilityToggle ? View.GONE : View.VISIBLE);
+                        webViewVisibilityToggle = !webViewVisibilityToggle;
                         new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
                     }
                 });

@@ -25,6 +25,8 @@ package co.frontyard.cordova.plugin.exoplayer;
 
 import android.app.*;
 import android.content.*;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.media.*;
 import android.net.*;
 import android.os.*;
@@ -106,7 +108,7 @@ public class Player {
         public void onRepeatModeChanged(int newRepeatMode) {
             // Need to see if we want to send this to Cordova.
         }
-    
+
         @Override
         public void onSeekProcessed() {
         }
@@ -116,7 +118,7 @@ public class Player {
         }
 
         @Override
-        public void onTimelineChanged(Timeline timeline, Object manifest) {
+        public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
             JSONObject payload = Payload.timelineChangedEvent(Player.this.exoPlayer, timeline, manifest);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
         }
@@ -201,11 +203,35 @@ public class Player {
         }
     };
 
-    public void createPlayer() {
+    public void createPlayer(CordovaWebView cordovaWebView) {
         if (!config.isAudioOnly()) {
-            createDialog();
+            if (config.isRunBehindWebViewMode()) {
+                createBehindWebView(cordovaWebView);
+            } else {
+                createDialog();
+            }
         }
         preparePlayer(config.getUri());
+    }
+
+    public void createBehindWebView(CordovaWebView cordovaWebView){
+        webView.getView().setBackgroundColor(Color.TRANSPARENT);
+
+        FrameLayout wrapperFrameLayout = (FrameLayout) cordovaWebView.getView().getParent();
+        LinearLayout linearLayout = new LinearLayout(activity);
+        linearLayout.setLayoutParams(new LinearLayout.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT));
+        wrapperFrameLayout.addView(linearLayout, 0);
+
+        FrameLayout mainLayout = LayoutProvider.getMainLayout(this.activity);
+        exoView = LayoutProvider.getExoPlayerView(this.activity, config);
+        exoView.setControllerVisibilityListener(playbackControlVisibilityListener);
+        mainLayout.addView(exoView);
+
+        linearLayout.addView(mainLayout);
+        exoView.requestFocus();
+        exoView.setOnTouchListener(onTouchListener);
+
+        LayoutProvider.setupController(exoView, activity, config.getController());
     }
 
     public void createDialog() {
@@ -432,5 +458,5 @@ public class Player {
         Log.e(TAG, msg);
         JSONObject payload = Payload.playerErrorEvent(Player.this.exoPlayer, null, msg);
         new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.ERROR, payload, true);
-    }   
+    }
 }
