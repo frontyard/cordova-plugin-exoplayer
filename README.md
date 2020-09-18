@@ -6,6 +6,11 @@ Cordova media player plugin using Google's ExoPlayer framework.
 
 Please send us links to your cool projects made with this plugin so we can include them on this page!
 
+## Changes in version 2.5.7
+- Support for UDP streams
+
+- Upgraded exoplayer to 2.9.5.
+
 ## Changes in version 2.5.6
 - Added ability to run ExoPlayer behind the Cordova WebView.
 

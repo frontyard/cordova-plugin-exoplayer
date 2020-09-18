@@ -66,5 +66,8 @@ module.exports = {
     },
     setWebViewBackgroundColor: function (parameters, successCallback, errorCallback) {
         cordova.exec(successCallback, errorCallback, "ExoPlayer", "setWebViewBackgroundColor", [parameters]);
+    },
+    setPlayWhenReady: function (parameters, successCallback, errorCallback) {
+        cordova.exec(successCallback, errorCallback, "ExoPlayer", "setPlayWhenReady", [parameters]);
     }
 };

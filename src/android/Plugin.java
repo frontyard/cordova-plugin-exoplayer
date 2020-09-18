@@ -85,6 +85,20 @@ public class Plugin extends CordovaPlugin {
                 });
                 return true;
             }
+            else if (action.equals("setPlayWhenReady")) {
+                if (self.player == null) {
+                    return false;
+                }
+                cordova.getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        Boolean state = data.optBoolean(0);
+                        self.player.setPlayWhenReady(state);
+                        new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
+                    }
+                });
+
+                return true;
+            }
             else if (action.equals("setStream")) {
                 if (self.player == null) {
                     return false;

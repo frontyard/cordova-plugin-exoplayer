@@ -31,10 +31,22 @@ import android.media.*;
 import android.net.*;
 import android.os.*;
 import android.util.*;
+import android.util.Log;
 import android.view.*;
 import android.widget.*;
-import com.google.android.exoplayer2.*;
+
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.LoadControl;
+import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.*;
+import com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory;
+import com.google.android.exoplayer2.extractor.ts.TsExtractor;
 import com.google.android.exoplayer2.source.*;
 import com.google.android.exoplayer2.source.dash.*;
 import com.google.android.exoplayer2.source.hls.*;
@@ -49,6 +61,9 @@ import java.lang.Math;
 import java.lang.Override;
 import org.apache.cordova.*;
 import org.json.*;
+
+import static com.google.android.exoplayer2.ExoPlayer.STATE_ENDED;
+import static com.google.android.exoplayer2.extractor.ts.TsExtractor.MODE_SINGLE_PMT;
 
 public class Player {
     public static final String TAG = "ExoPlayerPlugin";
@@ -315,6 +330,26 @@ public class Player {
         HttpDataSource.Factory httpDataSourceFactory = new DefaultHttpDataSourceFactory(userAgent, bandwidthMeter, connectTimeout, readTimeout, true);
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this.activity, bandwidthMeter, httpDataSourceFactory);
         MediaSource mediaSource;
+
+        if (isUdpUri(uri)) {
+            //Create default UDP Datasource and mediasource
+            DataSource.Factory factory = new DataSource.Factory() {
+                @Override
+                public DataSource createDataSource() {
+                    return new UdpDataSource(3000, 100000);
+                }
+            };
+
+            ExtractorsFactory tsExtractorFactory = new ExtractorsFactory() {
+                @Override
+                public Extractor[] createExtractors() {
+                    return new TsExtractor[]{new TsExtractor(MODE_SINGLE_PMT, new TimestampAdjuster(0), new DefaultTsPayloadReaderFactory())};
+                }
+            };
+            return new ExtractorMediaSource(uri, factory, tsExtractorFactory,null,null);
+
+        }
+
         int type = Util.inferContentType(uri);
         switch (type) {
             case C.TYPE_DASH:
@@ -364,6 +399,12 @@ public class Player {
         }
     }
 
+    private boolean isUdpUri(Uri uri) {
+        if (uri == null) return false;
+
+        return uri.toString().contains("udp://");
+    }
+
     public void close() {
         audioManager.abandonAudioFocus(audioFocusChangeListener);
         if (exoPlayer != null) {
@@ -391,6 +432,13 @@ public class Player {
         }
         else {
             pause();
+        }
+    }
+
+    public void setPlayWhenReady(Boolean state) {
+        if (null != exoPlayer) {
+            paused = state;
+            exoPlayer.setPlayWhenReady(state);
         }
     }
 
@@ -432,7 +480,7 @@ public class Player {
 
     public JSONObject getPlayerState() {
         return Payload.stateEvent(exoPlayer,
-                null != exoPlayer ? exoPlayer.getPlaybackState() : SimpleExoPlayer.STATE_ENDED,
+                null != exoPlayer ? exoPlayer.getPlaybackState() : STATE_ENDED,
                 Player.this.controllerVisibility == View.VISIBLE);
     }
 
