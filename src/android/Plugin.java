@@ -236,4 +236,11 @@ public class Plugin extends CordovaPlugin {
             return false;
         }
     }
+
+    public void onDestroy() {
+        if (this.player != null) {
+            this.player.close();
+        }
+    }
+
 }

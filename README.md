@@ -6,6 +6,10 @@ Cordova media player plugin using Google's ExoPlayer framework.
 
 Please send us links to your cool projects made with this plugin so we can include them on this page!
 
+## Changes in version 2.5.8
+- Fix player view placement
+- Force ExoPlayer to close when application is destroyed.
+
 ## Changes in version 2.5.7
 - Support for UDP streams
 
