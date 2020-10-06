@@ -47,7 +47,7 @@ public class Plugin extends CordovaPlugin {
                         }
                         JSONObject params = data.optJSONObject(0);
                         self.player = new Player(new Configuration(params), cordova.getActivity(), callbackContext, webView);
-                        self.player.createPlayer(webView);
+                        self.player.createPlayer();
                         new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
                     }
                 });

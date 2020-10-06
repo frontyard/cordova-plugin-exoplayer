@@ -77,6 +77,7 @@ public class Player {
     private int controllerVisibility;
     private boolean paused = false;
     private AudioManager audioManager;
+    private LinearLayout backgroundLinearLayout;
 
     public Player(Configuration config, Activity activity, CallbackContext callbackContext, CordovaWebView webView) {
         this.config = config;
@@ -218,10 +219,10 @@ public class Player {
         }
     };
 
-    public void createPlayer(CordovaWebView cordovaWebView) {
+    public void createPlayer() {
         if (!config.isAudioOnly()) {
             if (config.isRunBehindWebViewMode()) {
-                createBehindWebView(cordovaWebView);
+                createBehindWebView();
             } else {
                 createDialog();
             }
@@ -229,20 +230,20 @@ public class Player {
         preparePlayer(config.getUri());
     }
 
-    public void createBehindWebView(CordovaWebView cordovaWebView){
+    public void createBehindWebView(){
         webView.getView().setBackgroundColor(Color.TRANSPARENT);
-
-        FrameLayout wrapperFrameLayout = (FrameLayout) cordovaWebView.getView().getParent();
-        LinearLayout linearLayout = new LinearLayout(activity);
-        linearLayout.setLayoutParams(new LinearLayout.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT));
-        wrapperFrameLayout.addView(linearLayout, 0);
 
         FrameLayout mainLayout = LayoutProvider.getMainLayout(this.activity);
         exoView = LayoutProvider.getExoPlayerView(this.activity, config);
         exoView.setControllerVisibilityListener(playbackControlVisibilityListener);
         mainLayout.addView(exoView);
 
-        linearLayout.addView(mainLayout);
+        backgroundLinearLayout = LayoutProvider.getBackgroundLinearLayout(this.activity);
+        backgroundLinearLayout.addView(mainLayout);
+
+        FrameLayout wrapperFrameLayout = (FrameLayout) this.webView.getView().getParent();
+        wrapperFrameLayout.addView(backgroundLinearLayout, 0);
+
         exoView.requestFocus();
         exoView.setOnTouchListener(onTouchListener);
 
@@ -407,10 +408,19 @@ public class Player {
 
     public void close() {
         audioManager.abandonAudioFocus(audioFocusChangeListener);
+        FrameLayout wrapperFrameLayout = (FrameLayout) this.webView.getView().getParent();
         if (exoPlayer != null) {
+            exoPlayer.removeListener(playerEventListener);
+            exoPlayer.stop();
             exoPlayer.release();
             exoPlayer = null;
         }
+
+        if (backgroundLinearLayout != null) {
+            backgroundLinearLayout.removeAllViews();
+            wrapperFrameLayout.removeView(backgroundLinearLayout);
+        }
+
         if (this.dialog != null) {
             dialog.dismiss();
         }
