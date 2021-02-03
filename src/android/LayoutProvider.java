@@ -203,4 +203,10 @@ public class LayoutProvider {
 
         return lp;
     }
+
+    public static LinearLayout getBackgroundLinearLayout(Activity activity) {
+        LinearLayout linearLayout = new LinearLayout(activity);
+        linearLayout.setLayoutParams(new LinearLayout.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT));
+        return linearLayout;
+    }
 }

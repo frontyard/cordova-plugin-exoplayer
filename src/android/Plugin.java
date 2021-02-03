@@ -23,12 +23,16 @@
  */
 package co.frontyard.cordova.plugin.exoplayer;
 
+import android.graphics.Color;
 import android.net.*;
+import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import org.apache.cordova.*;
 import org.json.*;
 
 public class Plugin extends CordovaPlugin {
+    private String TAG = "EXOPLAYER";
     private Player player;
 
     @Override
@@ -47,6 +51,52 @@ public class Plugin extends CordovaPlugin {
                         new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
                     }
                 });
+                return true;
+            }
+            else if (action.equals("setWebViewVisibility")) {
+                cordova.getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        String visibilityString = data.optString(0);
+                        Visibility webViewVisibility = Visibility.VISIBLE;
+                        try {
+                            webViewVisibility = Visibility.valueOf(visibilityString);
+                        } catch (IllegalStateException e) {
+                            Log.d(TAG, "Inappropriate visibility, using VISIBLE as default");
+                        }
+                        webView.getView().setVisibility(webViewVisibility.getValue());
+                        new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
+                    }
+                });
+                return true;
+            }
+            else if (action.equals("setWebViewBackgroundColor")) {
+                cordova.getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        String colorString = data.optString(0);
+                        int parsedColor = Color.TRANSPARENT;
+                        try {
+                            parsedColor = Color.parseColor(colorString);
+                        } catch (IllegalStateException e) {
+                            Log.d(TAG, "Can't parse color, using TRANSPARENT as default");
+                        }
+                        webView.getView().setBackgroundColor(parsedColor);
+                        new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
+                    }
+                });
+                return true;
+            }
+            else if (action.equals("setPlayWhenReady")) {
+                if (self.player == null) {
+                    return false;
+                }
+                cordova.getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        Boolean state = data.optBoolean(0);
+                        self.player.setPlayWhenReady(state);
+                        new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
+                    }
+                });
+
                 return true;
             }
             else if (action.equals("setStream")) {
@@ -186,4 +236,11 @@ public class Plugin extends CordovaPlugin {
             return false;
         }
     }
+
+    public void onDestroy() {
+        if (this.player != null) {
+            this.player.close();
+        }
+    }
+
 }
