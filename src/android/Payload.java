@@ -23,6 +23,7 @@
  */
 package co.frontyard.cordova.plugin.exoplayer;
 
+import android.util.Log;
 import android.util.*;
 import android.view.*;
 import com.google.android.exoplayer2.*;

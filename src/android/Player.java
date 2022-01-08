@@ -23,6 +23,7 @@
  */
 package co.frontyard.cordova.plugin.exoplayer;
 
+import android.util.Log;
 import android.app.*;
 import android.content.*;
 import android.media.*;
@@ -406,7 +407,7 @@ public class Player {
 
     public JSONObject getPlayerState() {
         return Payload.stateEvent(exoPlayer,
-                null != exoPlayer ? exoPlayer.getPlaybackState() : SimpleExoPlayer.STATE_ENDED,
+                null != exoPlayer ? exoPlayer.getPlaybackState() : com.google.android.exoplayer2.Player.STATE_ENDED,
                 Player.this.controllerVisibility == View.VISIBLE);
     }
 
