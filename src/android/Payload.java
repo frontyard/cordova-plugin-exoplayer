@@ -123,7 +123,7 @@ public class Payload {
         return new JSONObject(map);
     }
 
-    public static JSONObject timelineChangedEvent(ExoPlayer player, Timeline timeline, Object manifest) {
+    public static JSONObject timelineChangedEvent(ExoPlayer player, Timeline timeline, int reason) {
         Map<String, String> map = new HashMap<String, String>();
         map.put("eventType", "TIMELINE_EVENT");
         int periodCount = timeline.getPeriodCount();
