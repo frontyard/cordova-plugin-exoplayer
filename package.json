@@ -1,0 +1,42 @@
+{
+  "name": "cordova-plugin-exoplayer",
+  "version": "2.5.5",
+  "description": "Media player for Cordova using Google's ExoPlayer framework",
+  "cordova": {
+    "id": "cordova-plugin-exoplayer",
+    "platforms": [
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frontyard/cordova-plugin-exoplayer.git"
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android",
+    "phonegap",
+    "cordova",
+    "ionic",
+    "android",
+    "exoplayer",
+    "exo",
+    "video",
+    "player"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=4.0.0"
+    }
+  ],
+  "author": "Nedim Cholich",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/frontyard/cordova-plugin-exoplayer/issues"
+  },
+  "homepage": "https://github.com/frontyard/cordova-plugin-exoplayer#readme",
+  "devDependencies": {
+    "jshint": "^2.9.0"
+  }
+}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="exo_buttons" type="id"/>
+    <item name="exo_image" type="id"/>
+    <item name="exo_title" type="id"/>
+    <item name="exo_subtitle" type="id"/>
+    <item name="exo_timebar" type="id"/>
+    <item name="exo_buffering" type="id"/>
+</resources>
