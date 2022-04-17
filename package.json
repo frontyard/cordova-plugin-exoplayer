@@ -1,16 +1,16 @@
 {
-  "name": "cordova-plugin-exoplayer",
+  "name": "cordova-plugin-exoplayer-smart",
   "version": "2.5.5",
   "description": "Media player for Cordova using Google's ExoPlayer framework",
   "cordova": {
-    "id": "cordova-plugin-exoplayer",
+    "id": "cordova-plugin-exoplayer-smart",
     "platforms": [
       "android"
     ]
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/frontyard/cordova-plugin-exoplayer.git"
+    "url": "git+https://github.com/naja7host/cordova-plugin-exoplayer-smart.git"
   },
   "keywords": [
     "ecosystem:cordova",
@@ -33,9 +33,9 @@
   "author": "Nedim Cholich",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/frontyard/cordova-plugin-exoplayer/issues"
+    "url": "https://github.com/naja7host/cordova-plugin-exoplayer-smart/issues"
   },
-  "homepage": "https://github.com/frontyard/cordova-plugin-exoplayer#readme",
+  "homepage": "https://github.com/naja7host/cordova-plugin-exoplayer-smart#readme",
   "devDependencies": {
     "jshint": "^2.9.0"
   }
