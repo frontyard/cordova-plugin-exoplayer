@@ -49,5 +49,6 @@
         <source-file src="src/android/Payload.java" target-dir="src/co/frontyard/cordova/plugin/exoplayer/"/>
         <source-file src="src/android/Player.java" target-dir="src/co/frontyard/cordova/plugin/exoplayer/"/>
         <source-file src="src/android/Plugin.java" target-dir="src/co/frontyard/cordova/plugin/exoplayer/"/>
+        <source-file src="src/android/Visibility.java" target-dir="src/co/frontyard/cordova/plugin/exoplayer/"/>
     </platform>
 </plugin>
