@@ -19,8 +19,7 @@
     </js-module>
 
     <platform name="android">
-        <framework src="com.google.android.exoplayer:exoplayer:2.9.6"/>
-        <framework src="com.squareup.picasso:picasso:2.5.2"/>
+        <framework src="src/gradle/exoPlayerGradle.gradle" custom="true" type="gradleReference"/>
 
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="ExoPlayer">
