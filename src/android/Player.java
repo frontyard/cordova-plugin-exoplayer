@@ -36,10 +36,12 @@ import com.google.android.exoplayer2.*;
 import com.google.android.exoplayer2.extractor.*;
 import com.google.android.exoplayer2.source.*;
 import com.google.android.exoplayer2.source.dash.*;
+import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.hls.*;
 import com.google.android.exoplayer2.source.smoothstreaming.*;
 import com.google.android.exoplayer2.trackselection.*;
 import com.google.android.exoplayer2.ui.*;
+import com.google.android.exoplayer2.ui.PlayerControlView.VisibilityListener;
 import com.google.android.exoplayer2.upstream.*;
 import com.google.android.exoplayer2.util.*;
 import com.squareup.picasso.*;
@@ -56,7 +58,7 @@ public class Player {
     private final Configuration config;
     private Dialog dialog;
     private SimpleExoPlayer exoPlayer;
-    private SimpleExoPlayerView exoView;
+    private PlayerView exoView;
     private CordovaWebView webView;
     private int controllerVisibility;
     private boolean paused = false;
@@ -174,7 +176,7 @@ public class Player {
         }
     };
 
-    private PlaybackControlView.VisibilityListener playbackControlVisibilityListener = new PlaybackControlView.VisibilityListener() {
+    private VisibilityListener playbackControlVisibilityListener = new VisibilityListener() {
         @Override
         public void onVisibilityChange(int visibility) {
             Player.this.controllerVisibility = visibility;
@@ -282,7 +284,6 @@ public class Player {
 
     private MediaSource getMediaSource(Uri uri, DefaultBandwidthMeter bandwidthMeter) {
         String userAgent = Util.getUserAgent(this.activity, config.getUserAgent());
-        Handler mainHandler = new Handler();
         int connectTimeout = config.getConnectTimeout();
         int readTimeout = config.getReadTimeout();
         int retryCount = config.getRetryCount();
@@ -293,23 +294,16 @@ public class Player {
         int type = Util.inferContentType(uri);
         switch (type) {
             case C.TYPE_DASH:
-                long livePresentationDelayMs = DashMediaSource.DEFAULT_LIVE_PRESENTATION_DELAY_PREFER_MANIFEST_MS;
-                DefaultDashChunkSource.Factory dashChunkSourceFactory = new DefaultDashChunkSource.Factory(dataSourceFactory);
-                // Last param is AdaptiveMediaSourceEventListener
-                mediaSource = new DashMediaSource(uri, dataSourceFactory, dashChunkSourceFactory, retryCount, livePresentationDelayMs, mainHandler, null);
+                mediaSource = new DashMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
                 break;
             case C.TYPE_HLS:
-                // Last param is AdaptiveMediaSourceEventListener
-                mediaSource = new HlsMediaSource(uri, dataSourceFactory, retryCount, mainHandler, null);
+                mediaSource = new HlsMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
                 break;
             case C.TYPE_SS:
-                DefaultSsChunkSource.Factory ssChunkSourceFactory = new DefaultSsChunkSource.Factory(dataSourceFactory);
-                // Last param is AdaptiveMediaSourceEventListener
-                mediaSource = new SsMediaSource(uri, dataSourceFactory, ssChunkSourceFactory, mainHandler, null);
+                mediaSource = new SsMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
                 break;
             default:
-                ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-                mediaSource = new ExtractorMediaSource(uri, dataSourceFactory, extractorsFactory, mainHandler, null);
+                mediaSource = new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
                 break;
         }
 
@@ -318,8 +312,12 @@ public class Player {
             Uri subtitleUri = Uri.parse(subtitleUrl);
             String subtitleType = inferSubtitleType(subtitleUri);
             Log.i(TAG, "Subtitle present: " + subtitleUri + ", type=" + subtitleType);
-            com.google.android.exoplayer2.Format textFormat = com.google.android.exoplayer2.Format.createTextSampleFormat(null, subtitleType, null, com.google.android.exoplayer2.Format.NO_VALUE, com.google.android.exoplayer2.Format.NO_VALUE, "en", null, 0);
-            MediaSource subtitleSource = new SingleSampleMediaSource(subtitleUri, httpDataSourceFactory, textFormat, C.TIME_UNSET);
+            com.google.android.exoplayer2.Format textFormat = new com.google.android.exoplayer2.Format.Builder()
+                .setLanguage("en")
+                .setSampleMimeType(subtitleType)
+                .build();
+            MediaSource subtitleSource = new SingleSampleMediaSource.Factory(httpDataSourceFactory)
+                .createMediaSource(subtitleUri, textFormat, C.TIME_UNSET);
             return new MergingMediaSource(mediaSource, subtitleSource);
         }
         else {

@@ -46,8 +46,8 @@ public class LayoutProvider {
         return view;
     }
 
-    public static SimpleExoPlayerView getExoPlayerView(Activity activity, Configuration config) {
-        SimpleExoPlayerView view = new SimpleExoPlayerView(activity);
+    public static PlayerView getExoPlayerView(Activity activity, Configuration config) {
+        PlayerView view = new PlayerView(activity);
         view.setLayoutParams(new LinearLayout.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT));
         if (config.isAspectRatioFillScreen()) {
             view.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
@@ -62,7 +62,7 @@ public class LayoutProvider {
         return view;
     }
 
-    public static void setupController(SimpleExoPlayerView parentView, Activity activity, JSONObject controller) {
+    public static void setupController(PlayerView parentView, Activity activity, JSONObject controller) {
         if (null != controller) {
             parentView.setUseController(true);
             setupButtons(parentView, activity, controller);
@@ -74,7 +74,7 @@ public class LayoutProvider {
         }
     }
 
-    private static void setupButtons(SimpleExoPlayerView parentView, Activity activity, JSONObject controller) {
+    private static void setupButtons(PlayerView parentView, Activity activity, JSONObject controller) {
         String packageName = activity.getPackageName();
         String buttonsColor = controller.optString("buttonsColor");
 
@@ -110,7 +110,7 @@ public class LayoutProvider {
         }
     }
 
-    private static void setupBar(SimpleExoPlayerView parentView, Activity activity, JSONObject controller) {
+    private static void setupBar(PlayerView parentView, Activity activity, JSONObject controller) {
         String streamTitle = controller.optString("streamTitle", null);
         String streamDescription = controller.optString("streamDescription", null);
         String streamImage = controller.optString("streamImage", null);
@@ -165,7 +165,7 @@ public class LayoutProvider {
         }
     }
 
-    private static void setupBuffering(SimpleExoPlayerView parentView, Activity activity, JSONObject controller) {
+    private static void setupBuffering(PlayerView parentView, Activity activity, JSONObject controller) {
         String bufferingColor = controller.optString("bufferingColor");
         ProgressBar bufferingBar = (ProgressBar)findView(parentView, activity, "exo_buffering");
         if (null != bufferingBar && null != bufferingColor) {
@@ -173,7 +173,7 @@ public class LayoutProvider {
         }
     }
 
-    public static void setBufferingVisibility(SimpleExoPlayerView parentView, Activity activity, boolean visibile) {
+    public static void setBufferingVisibility(PlayerView parentView, Activity activity, boolean visibile) {
         ProgressBar progressBar = (ProgressBar)findView(parentView, activity, "exo_buffering");
         if (null != progressBar) {
             progressBar.setVisibility(visibile ? View.VISIBLE : View.GONE);
