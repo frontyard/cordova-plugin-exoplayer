@@ -29,7 +29,7 @@ import android.util.*;
 import android.view.*;
 import android.widget.*;
 
-import com.google.android.exoplayer2.DefaultControlDispatcher;
+import com.google.android.exoplayer2.ForwardingPlayer;
 import com.google.android.exoplayer2.ui.*;
 import java.lang.String;
 import org.json.*;
@@ -46,13 +46,23 @@ public class LayoutProvider {
         return view;
     }
 
-    public static PlayerView getExoPlayerView(Activity activity, Configuration config) {
-        PlayerView view = new PlayerView(activity);
+    public static StyledPlayerView getExoPlayerView(Activity activity, Configuration config) {
+        StyledPlayerView view = new StyledPlayerView(activity);
         view.setLayoutParams(new LinearLayout.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT));
         if (config.isAspectRatioFillScreen()) {
             view.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
         }
-        view.setControlDispatcher(new DefaultControlDispatcher(config.getForwardTimeMs(), config.getRewindTimeMs()));
+        view.setPlayer(new ForwardingPlayer(view.getPlayer()) {
+            @Override
+            public long getSeekForwardIncrement() {
+                return config.getForwardTimeMs();
+            }
+
+            @Override
+            public long getSeekBackIncrement() {
+                return config.getRewindTimeMs();
+            }
+        });
         view.setShowMultiWindowTimeBar(true);
         view.setControllerHideOnTouch(true);
         view.setControllerShowTimeoutMs(config.getHideTimeout());
@@ -61,7 +71,7 @@ public class LayoutProvider {
         return view;
     }
 
-    public static void setupController(PlayerView parentView, Activity activity, JSONObject controller) {
+    public static void setupController(StyledPlayerView parentView, Activity activity, JSONObject controller) {
         if (null != controller) {
             parentView.setUseController(true);
             setupButtons(parentView, activity, controller);
@@ -73,7 +83,7 @@ public class LayoutProvider {
         }
     }
 
-    private static void setupButtons(PlayerView parentView, Activity activity, JSONObject controller) {
+    private static void setupButtons(StyledPlayerView parentView, Activity activity, JSONObject controller) {
         String packageName = activity.getPackageName();
         String buttonsColor = controller.optString("buttonsColor");
 
@@ -109,7 +119,7 @@ public class LayoutProvider {
         }
     }
 
-    private static void setupBar(PlayerView parentView, Activity activity, JSONObject controller) {
+    private static void setupBar(StyledPlayerView parentView, Activity activity, JSONObject controller) {
         String streamTitle = controller.optString("streamTitle", null);
         String streamDescription = controller.optString("streamDescription", null);
         String streamImage = controller.optString("streamImage", null);
@@ -164,7 +174,7 @@ public class LayoutProvider {
         }
     }
 
-    private static void setupBuffering(PlayerView parentView, Activity activity, JSONObject controller) {
+    private static void setupBuffering(StyledPlayerView parentView, Activity activity, JSONObject controller) {
         String bufferingColor = controller.optString("bufferingColor");
         ProgressBar bufferingBar = (ProgressBar)findView(parentView, activity, "exo_buffering");
         if (null != bufferingBar && null != bufferingColor) {
@@ -172,7 +182,7 @@ public class LayoutProvider {
         }
     }
 
-    public static void setBufferingVisibility(PlayerView parentView, Activity activity, boolean visible) {
+    public static void setBufferingVisibility(StyledPlayerView parentView, Activity activity, boolean visible) {
         ProgressBar progressBar = (ProgressBar)findView(parentView, activity, "exo_buffering");
         if (null != progressBar) {
             progressBar.setVisibility(visible ? View.VISIBLE : View.GONE);

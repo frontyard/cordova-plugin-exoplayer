@@ -24,11 +24,8 @@
 package co.frontyard.cordova.plugin.exoplayer;
 
 import android.util.Log;
-import android.util.*;
 import android.view.*;
 import com.google.android.exoplayer2.*;
-import com.google.android.exoplayer2.source.*;
-import com.google.android.exoplayer2.trackselection.*;
 import java.lang.*;
 import java.lang.Boolean;
 import java.lang.Integer;

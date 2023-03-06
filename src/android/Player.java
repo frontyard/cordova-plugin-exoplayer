@@ -38,9 +38,7 @@ import com.google.android.exoplayer2.source.*;
 import com.google.android.exoplayer2.source.dash.*;
 import com.google.android.exoplayer2.source.hls.*;
 import com.google.android.exoplayer2.source.smoothstreaming.*;
-import com.google.android.exoplayer2.trackselection.*;
 import com.google.android.exoplayer2.ui.*;
-import com.google.android.exoplayer2.ui.PlayerControlView.VisibilityListener;
 import com.google.android.exoplayer2.upstream.*;
 import com.google.android.exoplayer2.util.*;
 import com.google.android.exoplayer2.Player.PositionInfo;
@@ -56,8 +54,8 @@ public class Player {
     private final CallbackContext callbackContext;
     private final Configuration config;
     private Dialog dialog;
-    private SimpleExoPlayer exoPlayer;
-    private PlayerView exoView;
+    private ExoPlayer exoPlayer;
+    private StyledPlayerView exoView;
     private CordovaWebView webView;
     private int controllerVisibility;
     private boolean paused = false;
@@ -84,7 +82,7 @@ public class Player {
         }
 
         @Override
-        public void onPlayerError(PlaybackException error) {
+        public void onPlayerError(@NonNull PlaybackException error) {
             JSONObject payload = Payload.playerErrorEvent(Player.this.exoPlayer, error, null);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.ERROR, payload, true);
         }
@@ -117,11 +115,6 @@ public class Player {
         public void onTimelineChanged(@NonNull Timeline timeline, int reason) {
             JSONObject payload = Payload.timelineChangedEvent(Player.this.exoPlayer, timeline);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
-        }
-
-        @Override
-        public void onTracksChanged(@NonNull TrackGroupArray trackGroups, @NonNull TrackSelectionArray trackSelections) {
-            // Need to see if we want to send this to Cordova.
         }
     };
 
@@ -170,9 +163,9 @@ public class Player {
         }
     };
 
-    private VisibilityListener playbackControlVisibilityListener = new VisibilityListener() {
+    private StyledPlayerView.ControllerVisibilityListener playbackControlVisibilityListener = new StyledPlayerView.ControllerVisibilityListener() {
         @Override
-        public void onVisibilityChange(int visibility) {
+        public void onVisibilityChanged(int visibility) {
             Player.this.controllerVisibility = visibility;
         }
     };
@@ -248,7 +241,7 @@ public class Player {
         DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter.Builder(this.activity).build();
         //TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveVideoTrackSelection.Factory(bandwidthMeter);
 
-        exoPlayer = new SimpleExoPlayer.Builder(this.activity).build();
+        exoPlayer = new ExoPlayer.Builder(this.activity).build();
         exoPlayer.addListener(playerEventListener);
         if (null != exoView) {
             exoView.setPlayer(exoPlayer);
@@ -286,25 +279,26 @@ public class Player {
                 .setConnectTimeoutMs(connectTimeout)
                 .setReadTimeoutMs(readTimeout)
                 .setAllowCrossProtocolRedirects(true);
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this.activity, bandwidthMeter, httpDataSourceFactory);
+        DataSource.Factory dataSourceFactory = new DefaultDataSource.Factory(this.activity, httpDataSourceFactory)
+            .setTransferListener(bandwidthMeter);
         MediaSource mediaSource;
         int type = Util.inferContentType(uri);
         switch (type) {
-            case C.TYPE_DASH:
+            case C.CONTENT_TYPE_DASH:
                 mediaSource = new DashMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(new MediaItem.Builder()
                         .setUri(uri)
                         .setMimeType(MimeTypes.APPLICATION_MPD)
                         .build());
                 break;
-            case C.TYPE_HLS:
+            case C.CONTENT_TYPE_HLS:
                 mediaSource = new HlsMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(new MediaItem.Builder()
                         .setUri(uri)
                         .setMimeType(MimeTypes.APPLICATION_M3U8)
                         .build());
                 break;
-            case C.TYPE_SS:
+            case C.CONTENT_TYPE_SS:
                 mediaSource = new SsMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(MediaItem.fromUri(uri));
                 break;
@@ -321,7 +315,11 @@ public class Player {
             Log.i(TAG, "Subtitle present: " + subtitleUri + ", type=" + subtitleType);
             MediaSource subtitleSource = new SingleSampleMediaSource.Factory(httpDataSourceFactory)
                 .createMediaSource(
-                    new MediaItem.Subtitle(uri, subtitleType, "en", C.SELECTION_FLAG_AUTOSELECT),
+                    new MediaItem.SubtitleConfiguration.Builder(uri)
+                            .setMimeType(subtitleType)
+                            .setLanguage("en")
+                            .setSelectionFlags(C.SELECTION_FLAG_AUTOSELECT)
+                            .build(),
                     C.TIME_UNSET);
             return new MergingMediaSource(mediaSource, subtitleSource);
         }
