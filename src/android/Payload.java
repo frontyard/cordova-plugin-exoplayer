@@ -152,25 +152,26 @@ public class Payload {
         return new JSONObject(map);
     }
 
-    public static JSONObject playerErrorEvent(ExoPlayer player, ExoPlaybackException origin, String message) {
+    public static JSONObject playerErrorEvent(ExoPlayer player, PlaybackException origin, String message) {
         int type = 0;
         Map<String, String> map = new HashMap<String, String>();
         map.put("eventType", "PLAYER_ERROR_EVENT");
 
-        if (null != origin) {
+        if (null != origin && origin instanceof ExoPlaybackException) {
             Throwable error = (Throwable) origin;
+            ExoPlaybackException exoOrigin = (ExoPlaybackException) origin;
 
-            type = origin.type;
+            type = exoOrigin.type;
             if (type == ExoPlaybackException.TYPE_RENDERER) {
-                error = origin.getRendererException();
+                error = exoOrigin.getRendererException();
                 map.put("errorType", "RENDERER");
             }
             else if (type == ExoPlaybackException.TYPE_SOURCE) {
-                error = origin.getSourceException();
+                error = exoOrigin.getSourceException();
                 map.put("errorType", "SOURCE");
             }
             else if (type == ExoPlaybackException.TYPE_UNEXPECTED) {
-                error = origin.getUnexpectedException();
+                error = exoOrigin.getUnexpectedException();
                 map.put("errorType", "UNEXPECTED");
             }
             else {

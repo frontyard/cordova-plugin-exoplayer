@@ -43,6 +43,7 @@ import com.google.android.exoplayer2.ui.*;
 import com.google.android.exoplayer2.ui.PlayerControlView.VisibilityListener;
 import com.google.android.exoplayer2.upstream.*;
 import com.google.android.exoplayer2.util.*;
+import com.google.android.exoplayer2.Player.PositionInfo;
 import java.lang.*;
 import java.lang.Math;
 import java.lang.Override;
@@ -70,7 +71,7 @@ public class Player {
         this.audioManager = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
     }
 
-    private ExoPlayer.EventListener playerEventListener = new ExoPlayer.EventListener() {
+    private ExoPlayer.Listener playerEventListener = new ExoPlayer.Listener() {
         @Override
         public void onIsLoadingChanged(boolean isLoading) {
             JSONObject payload = Payload.loadingEvent(Player.this.exoPlayer, isLoading);
@@ -83,7 +84,7 @@ public class Player {
         }
 
         @Override
-        public void onPlayerError(@NonNull ExoPlaybackException error) {
+        public void onPlayerError(PlaybackException error) {
             JSONObject payload = Payload.playerErrorEvent(Player.this.exoPlayer, error, null);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.ERROR, payload, true);
         }
@@ -98,7 +99,7 @@ public class Player {
         }
 
         @Override
-        public void onPositionDiscontinuity(int reason) {
+        public void onPositionDiscontinuity(@NonNull PositionInfo oldPosition, @NonNull PositionInfo newPosition, int reason) {
             JSONObject payload = Payload.positionDiscontinuityEvent(Player.this.exoPlayer, reason);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
         }

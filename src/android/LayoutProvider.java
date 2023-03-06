@@ -25,12 +25,12 @@ package co.frontyard.cordova.plugin.exoplayer;
 
 import android.app.*;
 import android.graphics.*;
-import android.text.*;
 import android.util.*;
 import android.view.*;
 import android.widget.*;
+
+import com.google.android.exoplayer2.DefaultControlDispatcher;
 import com.google.android.exoplayer2.ui.*;
-import java.lang.*;
 import java.lang.String;
 import org.json.*;
 import com.squareup.picasso.*;
@@ -52,8 +52,7 @@ public class LayoutProvider {
         if (config.isAspectRatioFillScreen()) {
             view.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
         }
-        view.setFastForwardIncrementMs(config.getForwardTimeMs());
-        view.setRewindIncrementMs(config.getRewindTimeMs());
+        view.setControlDispatcher(new DefaultControlDispatcher(config.getForwardTimeMs(), config.getRewindTimeMs()));
         view.setShowMultiWindowTimeBar(true);
         view.setControllerHideOnTouch(true);
         view.setControllerShowTimeoutMs(config.getHideTimeout());
@@ -173,10 +172,10 @@ public class LayoutProvider {
         }
     }
 
-    public static void setBufferingVisibility(PlayerView parentView, Activity activity, boolean visibile) {
+    public static void setBufferingVisibility(PlayerView parentView, Activity activity, boolean visible) {
         ProgressBar progressBar = (ProgressBar)findView(parentView, activity, "exo_buffering");
         if (null != progressBar) {
-            progressBar.setVisibility(visibile ? View.VISIBLE : View.GONE);
+            progressBar.setVisibility(visible ? View.VISIBLE : View.GONE);
         }
     }
 
