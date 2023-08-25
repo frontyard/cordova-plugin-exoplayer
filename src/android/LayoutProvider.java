@@ -32,10 +32,15 @@ import android.widget.*;
 import com.google.android.exoplayer2.ForwardingPlayer;
 import com.google.android.exoplayer2.ui.*;
 import java.lang.String;
+
 import org.json.*;
 import com.squareup.picasso.*;
 
+import android.util.Log;
+
 public class LayoutProvider {
+    public static final String TAG = "LayoutProvider";
+
     private enum BUTTON { exo_prev, exo_rew, exo_play, exo_pause, exo_ffwd, exo_next }
 
     public static FrameLayout getMainLayout(Activity activity) {
@@ -52,22 +57,27 @@ public class LayoutProvider {
         if (config.isAspectRatioFillScreen()) {
             view.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
         }
-        view.setPlayer(new ForwardingPlayer(view.getPlayer()) {
-            @Override
-            public long getSeekForwardIncrement() {
-                return config.getForwardTimeMs();
-            }
 
-            @Override
-            public long getSeekBackIncrement() {
-                return config.getRewindTimeMs();
-            }
-        });
-        view.setShowMultiWindowTimeBar(true);
-        view.setControllerHideOnTouch(true);
-        view.setControllerShowTimeoutMs(config.getHideTimeout());
+        if (view.getPlayer() == null) {
+            Log.i(TAG, "RIK - Player is still null -- view.getPlayer() returned null");
+        } else {
+            view.setPlayer(new ForwardingPlayer(view.getPlayer()) {
+                @Override
+                public long getSeekForwardIncrement() {
+                    return config.getForwardTimeMs();
+                }
 
-        setupController(view, activity, config.getController());
+                @Override
+                public long getSeekBackIncrement() {
+                    return config.getRewindTimeMs();
+                }
+            });
+            view.setShowMultiWindowTimeBar(true);
+            view.setControllerHideOnTouch(true);
+            view.setControllerShowTimeoutMs(config.getHideTimeout());
+
+            setupController(view, activity, config.getController());
+        }
         return view;
     }
 

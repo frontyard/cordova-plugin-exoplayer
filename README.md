@@ -12,6 +12,12 @@ Please send us links to your cool projects made with this plugin so we can inclu
 |2.5.6|2.9.6|
 |2.5.5|2.8.1|
 |2.5.4|2.6.1|
+|2.5.7|2.18.1|
+
+## Changes in version 2.5.7
+Upgrade exoplayer to 2.18.1
+Merge changes from  netmikey fork
+- Various updates needed to remove `SimpleExoPlayer`
 
 ## Changin in version 2.5.6
 Upgraded exoplayer to 2.9.6
@@ -28,13 +34,13 @@ cordova-android: ^9.1.0
 
 ## Changes in version 2.5.3
 - After observing performance issues removing the usage of okhttp.
-- Removing the 'android.hardware.touchscreen' check before adding touch handler. This feature is not reliably reported by various devices. 
+- Removing the 'android.hardware.touchscreen' check before adding touch handler. This feature is not reliably reported by various devices.
 
 ## Changes in version 2.5.2
 - Upgraded exoplayer to version 2.5.1
 - Only adding touchscreen event handler if device has "android.hardware.touchscreen" system feature.
-- Added `connectTimeout`, `readTimeout` and `retryCount` configuration settings. These are related to http client player uses. 
-- Added `seekBy` which is simmilar to seekTo but operates relative to the current possition. Value can be positive (seek forward) or negative (seek backwards). 
+- Added `connectTimeout`, `readTimeout` and `retryCount` configuration settings. These are related to http client player uses.
+- Added `seekBy` which is simmilar to seekTo but operates relative to the current possition. Value can be positive (seek forward) or negative (seek backwards).
 
 ## Changes in version 2.5.1
 - Added boolean options `hidePosition` and `hideDuration`. When playing dvr content thise numbers are relative to current time and very confusing to users. Adding ability to hide the numbers until better solution can be found.
@@ -42,7 +48,7 @@ cordova-android: ^9.1.0
 
 ## Changes in version 2.5.0
 - Removed configuration setting `skipTime` and replaced it with separate `forwardTime` and `rewindTime`.
-- Sending `TIMELINE_EVENT` to Cordova with `periodDurationX` and `periodWindowPositionX` properties for duration and window position for each period (marked X) in the stream.  
+- Sending `TIMELINE_EVENT` to Cordova with `periodDurationX` and `periodWindowPositionX` properties for duration and window position for each period (marked X) in the stream.
 
 ## Changes in version 2.4.5
 - Added `setController` method to update the controller mid-stream. It accepts the same controller object that is used as part of parameters for `show` method.
@@ -55,13 +61,13 @@ cordova-android: ^9.1.0
 
 ## Changes in version 2.4.1
 - When audio focus changes, plugin will send `AUDIO_FOCUS_EVENT` with parameter `audioFocus` that can be on of:
- `AUDIOFOCUS_LOSS_TRANSIENT`, `AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK`, `AUDIOFOCUS_GAIN`, `AUDIOFOCUS_LOSS`. 
+ `AUDIOFOCUS_LOSS_TRANSIENT`, `AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK`, `AUDIOFOCUS_GAIN`, `AUDIOFOCUS_LOSS`.
 
 ## Changes in version 2.4.0
 - Controller will no longer show automatically on touch and key events.
 - Added showController and hideController methods for explicit control of controller visibility.
 - Plugin will not longer close on KEYCODE_BACK key event, please call .close() explicitly.
-- Plugin will request audio focus on startup. It will also listen for audio focus events and pause/play on those events. It will close on AUDIOFOCUS_LOSS. 
+- Plugin will request audio focus on startup. It will also listen for audio focus events and pause/play on those events. It will close on AUDIOFOCUS_LOSS.
 - START_EVENT will return additional info `audioFocus` which can be AUDIOFOCUS_REQUEST_FAILED or AUDIOFOCUS_REQUEST_GRANTED.
 - STATE_EVENT will return additional info `controllerVisible` to tell the app if controller is visible or not.
 
@@ -78,12 +84,12 @@ cordova-android: ^9.1.0
 Create a new Cordova Project
 
     $ cordova create hello com.example.helloapp Hello
-    
+
 Install the plugin
 
     $ cd hello
     $ cordova plugin add cordova-plugin-exoplayer
-    
+
 
 Edit `www/js/index.js` and add the following code inside `onDeviceReady`
 
@@ -104,7 +110,7 @@ Edit `www/js/index.js` and add the following code inside `onDeviceReady`
 Plugin methods exported via window.ExoPlayer
 ```js
 {
-    setStream(url, controllerConfig) // switch stream without disposing of the player. controllerConfig is "controller" part of the inital parameters. 
+    setStream(url, controllerConfig) // switch stream without disposing of the player. controllerConfig is "controller" part of the inital parameters.
     playPause() // will pause if playing and play if paused :-)
     stop() // will stop the current stream
     seekTo(milliseconds) // jump to particular poing into the stream
@@ -116,7 +122,7 @@ Plugin methods exported via window.ExoPlayer
 }
 ```
 
-This is what `parameters` look like for the `show` call, most of them are optional: 
+This is what `parameters` look like for the `show` call, most of them are optional:
 ```js
 {
     url: 'https://devimages.apple.com.edgekey.net/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8',
@@ -156,7 +162,7 @@ Controller is composed of several pieces. To the left there is optional streamIm
 
 Playback control buttons are centered on the screen and use default ExoPlayer icons. Optionally you can override these by your own images via controlIcons object.
 
-You can pass `subtitleUrl` for subtitle to be shown over the video. We currently support .srt and .vtt subtitle formats. Subtitles are not supported on all stream types, as ExoPlayer has requirement that both video and subtitle "must have the same number of periods, and must not have any dynamic windows", which means for simple mp4s it should work, but on more complex HLS/Dash setups it might not. 
+You can pass `subtitleUrl` for subtitle to be shown over the video. We currently support .srt and .vtt subtitle formats. Subtitles are not supported on all stream types, as ExoPlayer has requirement that both video and subtitle "must have the same number of periods, and must not have any dynamic windows", which means for simple mp4s it should work, but on more complex HLS/Dash setups it might not.
 
 If you pass in `audioOnly: true`, make sure to manually close the player on some event (like escape button) since the plugin won't be detecting keypresses when playing audio in the background.
 
@@ -165,7 +171,7 @@ If you want to show default control buttons (play/pause, rewind, forward) you ne
     controlIcons: {
     }
 ```
- 
+
 Plugin will send following events back to Cordova app through successCallback specified through show function:
 ```js
 START_EVENT
@@ -179,7 +185,7 @@ SEEK_EVENT
 PLAYER_ERROR_EVENT
 TIMELINE_EVENT
 ```
-Each event will send JSON payload coresponding to that event. Some events (where appropriate) will also send additional information about playback like duration, postion, etc. 
+Each event will send JSON payload coresponding to that event. Some events (where appropriate) will also send additional information about playback like duration, postion, etc.
 
 Example of key events:
 ```js
@@ -189,7 +195,7 @@ Example of key events:
     'eventKeycode':'KEYCODE_VOLUME_UP'
 }
 
-{   
+{
     'eventType':'KEY_EVENT',
     'eventAction':'ACTION_UP',
     'eventKeycode':'KEYCODE_VOLUME_UP'
@@ -206,7 +212,7 @@ Example of touch events:
     'eventAxisY':1321.8009033203125
 }
 
-{   
+{
     'eventType':'TOUCH_EVENT',
     'eventAction':'ACTION_MOVE',
     'eventAxisX':543,
@@ -224,7 +230,7 @@ Example of touch events:
 Install Android platform
 
     cordova platform add android
-    
+
 Run the code
 
     cordova run
@@ -236,7 +242,7 @@ For examples of using this plugin in an [IONIC](https://ionicframework.com/) app
 For IONIC Native see [npm module](https://www.npmjs.com/package/@ionic-native/android-exoplayer).
 
 ## Contributing
-    
+
 1. Fork it
 2. Create your feature branch off of current upstram branch (currently 2.0.0)
 3. Commit and push your changes to that branch
