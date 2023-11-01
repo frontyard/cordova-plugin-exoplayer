@@ -10,10 +10,15 @@ Please send us links to your cool projects made with this plugin so we can inclu
 |plugin|exoplayer|
 |-----|---------|
 |2.6.0|2.18.1|
+|2.5.7|2.18.1|
 |2.5.6|2.9.6|
 |2.5.5|2.8.1|
 |2.5.4|2.6.1|
-|2.5.7|2.18.1|
+
+## Changes in version 2.6.0
+Add alternative constructor to allow creation of player without Android UI
+ - New feature, hence change in package minor version
+Fix crash at playback start
 
 ## Changes in version 2.5.7
 Upgrade exoplayer to 2.18.1
