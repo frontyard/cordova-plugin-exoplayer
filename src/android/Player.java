@@ -23,29 +23,29 @@
  */
 package co.frontyard.cordova.plugin.exoplayer;
 
+import android.graphics.Color;
 import android.util.Log;
 import android.app.*;
 import android.content.*;
 import android.media.*;
 import android.net.*;
-import android.os.*;
-import android.util.*;
 import android.view.*;
 import android.widget.*;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.ContentFrameLayout;
+
 import com.google.android.exoplayer2.*;
-import com.google.android.exoplayer2.extractor.*;
 import com.google.android.exoplayer2.source.*;
 import com.google.android.exoplayer2.source.dash.*;
 import com.google.android.exoplayer2.source.hls.*;
 import com.google.android.exoplayer2.source.smoothstreaming.*;
-import com.google.android.exoplayer2.trackselection.*;
 import com.google.android.exoplayer2.ui.*;
 import com.google.android.exoplayer2.upstream.*;
 import com.google.android.exoplayer2.util.*;
-import com.squareup.picasso.*;
+import com.google.android.exoplayer2.Player.PositionInfo;
 import java.lang.*;
-import java.lang.Math;
-import java.lang.Override;
+
 import org.apache.cordova.*;
 import org.json.*;
 
@@ -55,12 +55,13 @@ public class Player {
     private final CallbackContext callbackContext;
     private final Configuration config;
     private Dialog dialog;
-    private SimpleExoPlayer exoPlayer;
-    private SimpleExoPlayerView exoView;
+    private ExoPlayer exoPlayer;
+    private StyledPlayerView exoView;
     private CordovaWebView webView;
     private int controllerVisibility;
     private boolean paused = false;
     private AudioManager audioManager;
+    private ContentFrameLayout parentLayout;
 
     public Player(Configuration config, Activity activity, CallbackContext callbackContext, CordovaWebView webView) {
         this.config = config;
@@ -70,26 +71,26 @@ public class Player {
         this.audioManager = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
     }
 
-    private ExoPlayer.EventListener playerEventListener = new ExoPlayer.EventListener() {
+    private ExoPlayer.Listener playerEventListener = new ExoPlayer.Listener() {
         @Override
-        public void onLoadingChanged(boolean isLoading) {
+        public void onIsLoadingChanged(boolean isLoading) {
             JSONObject payload = Payload.loadingEvent(Player.this.exoPlayer, isLoading);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
         }
 
         @Override
-        public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+        public void onPlaybackParametersChanged(@NonNull PlaybackParameters playbackParameters) {
             Log.i(TAG, "Playback parameters changed");
         }
 
         @Override
-        public void onPlayerError(ExoPlaybackException error) {
+        public void onPlayerError(@NonNull PlaybackException error) {
             JSONObject payload = Payload.playerErrorEvent(Player.this.exoPlayer, error, null);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.ERROR, payload, true);
         }
 
         @Override
-        public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+        public void onPlaybackStateChanged(int playbackState) {
             if (config.getShowBuffering()) {
                 LayoutProvider.setBufferingVisibility(exoView, activity, playbackState == ExoPlayer.STATE_BUFFERING);
             }
@@ -98,7 +99,7 @@ public class Player {
         }
 
         @Override
-        public void onPositionDiscontinuity(int reason) {
+        public void onPositionDiscontinuity(@NonNull PositionInfo oldPosition, @NonNull PositionInfo newPosition, int reason) {
             JSONObject payload = Payload.positionDiscontinuityEvent(Player.this.exoPlayer, reason);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
         }
@@ -107,35 +108,28 @@ public class Player {
         public void onRepeatModeChanged(int newRepeatMode) {
             // Need to see if we want to send this to Cordova.
         }
-    
-        @Override
-        public void onSeekProcessed() {
-        }
 
         @Override
         public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
         }
 
         @Override
-        public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
+        public void onTimelineChanged(@NonNull Timeline timeline, int reason) {
             JSONObject payload = Payload.timelineChangedEvent(Player.this.exoPlayer, timeline);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
-        }
-
-        @Override
-        public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-            // Need to see if we want to send this to Cordova.
         }
     };
 
     private DialogInterface.OnDismissListener dismissListener = new DialogInterface.OnDismissListener() {
         @Override
         public void onDismiss(DialogInterface dialog) {
+            Log.i(TAG, "Player dialog dismissed");
+
             if (exoPlayer != null) {
                 exoPlayer.release();
             }
             exoPlayer = null;
-            JSONObject payload = Payload.stopEvent(exoPlayer);
+            JSONObject payload = Payload.stopEvent(null);
             new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.OK, payload, true);
         }
     };
@@ -143,8 +137,9 @@ public class Player {
     private DialogInterface.OnKeyListener onKeyListener = new DialogInterface.OnKeyListener() {
         @Override
         public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-            int action = event.getAction();
             String key = KeyEvent.keyCodeToString(event.getKeyCode());
+            Log.i(TAG, "onKey listener " + keyCode + "/ '" + key + "'");
+
             // We need android to handle these key events
             if (key.equals("KEYCODE_VOLUME_UP") ||
                     key.equals("KEYCODE_VOLUME_DOWN") ||
@@ -174,9 +169,9 @@ public class Player {
         }
     };
 
-    private PlaybackControlView.VisibilityListener playbackControlVisibilityListener = new PlaybackControlView.VisibilityListener() {
+    private StyledPlayerView.ControllerVisibilityListener playbackControlVisibilityListener = new StyledPlayerView.ControllerVisibilityListener() {
         @Override
-        public void onVisibilityChange(int visibility) {
+        public void onVisibilityChanged(int visibility) {
             Player.this.controllerVisibility = visibility;
         }
     };
@@ -203,10 +198,20 @@ public class Player {
     };
 
     public void createPlayer() {
-        if (!config.isAudioOnly()) {
+        Log.i(TAG, "Playing " + config.getUri());
+
+        if (config.useInlineView()) {
+            // Using a dialog doesn't work for us, as controls are drawn in HTML view (cordova ui)
+            createPlayerInCordovaUI();
+
+        } else if (!config.isAudioOnly()) {
             createDialog();
         }
         preparePlayer(config.getUri());
+
+        if (config.useInlineView()) {
+            setController(config.getController());
+        }
     }
 
     public void createDialog() {
@@ -239,6 +244,38 @@ public class Player {
         LayoutProvider.setupController(exoView, activity, config.getController());
     }
 
+    public void createPlayerInCordovaUI() {
+        exoView = LayoutProvider.getExoPlayerView(this.activity, config);
+        exoView.setControllerVisibilityListener(playbackControlVisibilityListener);
+
+        exoView.setElevation(99);
+        exoView.setVisibility(View.VISIBLE);
+        exoView.setBackgroundColor(Color.BLACK);
+
+        try {
+            View webViewImpl = webView.getEngine().getView();
+            Object webViewParent = webViewImpl.getParent();
+
+            Log.d(TAG, "Have a " + (webViewImpl == null ? "empty" : "valid") + " parent View");
+            if (webViewImpl != null) {
+                Log.d(TAG, "parentView is a " + webViewImpl.getClass().getCanonicalName());
+            }
+
+            // Cordova webview is in a ContentFrameLayout (for plugin version 12 it is)
+            parentLayout = (ContentFrameLayout)webViewParent;
+            parentLayout.addView(exoView);
+
+            // Keep controls on top of player.
+            webViewImpl.setElevation(101);
+        }
+        catch (Exception e) {
+            Log.e(TAG, "Problem adding exoplayer to cordova's webview containers: " + e.getMessage());
+        }
+
+        exoView.requestFocus();
+        exoView.setOnTouchListener(onTouchListener);
+    }
+
     private int setupAudio() {
         activity.setVolumeControlStream(AudioManager.STREAM_MUSIC);
         return audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
@@ -249,25 +286,37 @@ public class Player {
         String audioFocusString = audioFocusResult == AudioManager.AUDIOFOCUS_REQUEST_FAILED ?
                 "AUDIOFOCUS_REQUEST_FAILED" :
                 "AUDIOFOCUS_REQUEST_GRANTED";
-        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter.Builder(this.activity).build();
         //TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveVideoTrackSelection.Factory(bandwidthMeter);
-        TrackSelector trackSelector = new DefaultTrackSelector();
-        LoadControl loadControl = new DefaultLoadControl();
 
-        exoPlayer = ExoPlayerFactory.newSimpleInstance(this.activity, trackSelector, loadControl);
+        exoPlayer = new ExoPlayer.Builder(this.activity).build();
         exoPlayer.addListener(playerEventListener);
         if (null != exoView) {
-            exoView.setPlayer(exoPlayer);
+            exoView.setPlayer(new ForwardingPlayer(exoPlayer) {
+                @Override
+                public long getSeekForwardIncrement() {
+                    Log.d(TAG, "ForwardingPlayer::getSeekForwardIncrement: " + config.getForwardTimeMs());
+                    return config.getForwardTimeMs();
+                }
+
+                @Override
+                public long getSeekBackIncrement() {
+                    Log.d(TAG, "ForwardingPlayer::getSeekBackIncrement: " + config.getRewindTimeMs());
+                    return config.getRewindTimeMs();
+                }
+            });
         }
 
         MediaSource mediaSource = getMediaSource(uri, bandwidthMeter);
         if (mediaSource != null) {
-            long offset = config.getSeekTo();
+            long startTimeMS = config.getSeekTo();
             boolean autoPlay = config.autoPlay();
-            if (offset > -1) {
-                exoPlayer.seekTo(offset);
+            if (startTimeMS > 0) {
+                exoPlayer.setMediaSource(mediaSource, startTimeMS);
+            } else {
+                exoPlayer.setMediaSource(mediaSource);
             }
-            exoPlayer.prepare(mediaSource);
+            exoPlayer.prepare();
 
             exoPlayer.setPlayWhenReady(autoPlay);
             paused = !autoPlay;
@@ -282,34 +331,41 @@ public class Player {
 
     private MediaSource getMediaSource(Uri uri, DefaultBandwidthMeter bandwidthMeter) {
         String userAgent = Util.getUserAgent(this.activity, config.getUserAgent());
-        Handler mainHandler = new Handler();
         int connectTimeout = config.getConnectTimeout();
         int readTimeout = config.getReadTimeout();
-        int retryCount = config.getRetryCount();
 
-        HttpDataSource.Factory httpDataSourceFactory = new DefaultHttpDataSourceFactory(userAgent, bandwidthMeter, connectTimeout, readTimeout, true);
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this.activity, bandwidthMeter, httpDataSourceFactory);
+        HttpDataSource.Factory httpDataSourceFactory = new DefaultHttpDataSource.Factory()
+                .setUserAgent(userAgent)
+                .setTransferListener(bandwidthMeter)
+                .setConnectTimeoutMs(connectTimeout)
+                .setReadTimeoutMs(readTimeout)
+                .setAllowCrossProtocolRedirects(true);
+        DataSource.Factory dataSourceFactory = new DefaultDataSource.Factory(this.activity, httpDataSourceFactory)
+            .setTransferListener(bandwidthMeter);
         MediaSource mediaSource;
         int type = Util.inferContentType(uri);
         switch (type) {
-            case C.TYPE_DASH:
-                long livePresentationDelayMs = DashMediaSource.DEFAULT_LIVE_PRESENTATION_DELAY_PREFER_MANIFEST_MS;
-                DefaultDashChunkSource.Factory dashChunkSourceFactory = new DefaultDashChunkSource.Factory(dataSourceFactory);
-                // Last param is AdaptiveMediaSourceEventListener
-                mediaSource = new DashMediaSource(uri, dataSourceFactory, dashChunkSourceFactory, retryCount, livePresentationDelayMs, mainHandler, null);
+            case C.CONTENT_TYPE_DASH:
+                mediaSource = new DashMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(new MediaItem.Builder()
+                        .setUri(uri)
+                        .setMimeType(MimeTypes.APPLICATION_MPD)
+                        .build());
                 break;
-            case C.TYPE_HLS:
-                // Last param is AdaptiveMediaSourceEventListener
-                mediaSource = new HlsMediaSource(uri, dataSourceFactory, retryCount, mainHandler, null);
+            case C.CONTENT_TYPE_HLS:
+                mediaSource = new HlsMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(new MediaItem.Builder()
+                        .setUri(uri)
+                        .setMimeType(MimeTypes.APPLICATION_M3U8)
+                        .build());
                 break;
-            case C.TYPE_SS:
-                DefaultSsChunkSource.Factory ssChunkSourceFactory = new DefaultSsChunkSource.Factory(dataSourceFactory);
-                // Last param is AdaptiveMediaSourceEventListener
-                mediaSource = new SsMediaSource(uri, dataSourceFactory, ssChunkSourceFactory, mainHandler, null);
+            case C.CONTENT_TYPE_SS:
+                mediaSource = new SsMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(MediaItem.fromUri(uri));
                 break;
             default:
-                ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-                mediaSource = new ExtractorMediaSource(uri, dataSourceFactory, extractorsFactory, mainHandler, null);
+                mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(MediaItem.fromUri(uri));
                 break;
         }
 
@@ -318,8 +374,14 @@ public class Player {
             Uri subtitleUri = Uri.parse(subtitleUrl);
             String subtitleType = inferSubtitleType(subtitleUri);
             Log.i(TAG, "Subtitle present: " + subtitleUri + ", type=" + subtitleType);
-            com.google.android.exoplayer2.Format textFormat = com.google.android.exoplayer2.Format.createTextSampleFormat(null, subtitleType, null, com.google.android.exoplayer2.Format.NO_VALUE, com.google.android.exoplayer2.Format.NO_VALUE, "en", null, 0);
-            MediaSource subtitleSource = new SingleSampleMediaSource(subtitleUri, httpDataSourceFactory, textFormat, C.TIME_UNSET);
+            MediaSource subtitleSource = new SingleSampleMediaSource.Factory(httpDataSourceFactory)
+                .createMediaSource(
+                    new MediaItem.SubtitleConfiguration.Builder(uri)
+                            .setMimeType(subtitleType)
+                            .setLanguage("en")
+                            .setSelectionFlags(C.SELECTION_FLAG_AUTOSELECT)
+                            .build(),
+                    C.TIME_UNSET);
             return new MergingMediaSource(mediaSource, subtitleSource);
         }
         else {
@@ -340,21 +402,29 @@ public class Player {
     }
 
     public void close() {
+        Log.i(TAG, "closing stream");
         audioManager.abandonAudioFocus(audioFocusChangeListener);
         if (exoPlayer != null) {
+            exoPlayer.setPlayWhenReady(false);
+            exoPlayer.stop();
             exoPlayer.release();
             exoPlayer = null;
         }
         if (this.dialog != null) {
             dialog.dismiss();
         }
+
+        if (parentLayout != null && exoView != null) {
+            parentLayout.removeView(exoView);
+        }
     }
 
     public void setStream(Uri uri, JSONObject controller) {
         if (null != uri && null != exoPlayer) {
-            DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+            DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter.Builder(null).build();
             MediaSource mediaSource = getMediaSource(uri, bandwidthMeter);
-            exoPlayer.prepare(mediaSource);
+            exoPlayer.setMediaSource(mediaSource);
+            exoPlayer.prepare();
             play();
         }
         setController(controller);
@@ -370,6 +440,7 @@ public class Player {
     }
 
     private void pause() {
+
         if (null != exoPlayer) {
             paused = true;
             exoPlayer.setPlayWhenReady(false);
@@ -382,27 +453,33 @@ public class Player {
     }
 
     public void stop() {
+        Log.i(TAG, "STOP" +  ( (null == exoPlayer) ? " exoPlayer not yet initialized" : ""));
+
         paused = false;
         exoPlayer.stop();
     }
 
     private long normalizeOffset(long newTime) {
         long duration = exoPlayer.getDuration();
-        return duration == 0 ? 0 : Math.min(Math.max(0, newTime), duration);
+        if (duration == C.TIME_UNSET) return newTime;
+
+        return Math.min(Math.max(0, newTime), duration);
     }
 
     public JSONObject seekTo(long timeMillis) {
         long newTime = normalizeOffset(timeMillis);
+        Log.i(TAG, "SEEK (to) " +  timeMillis  + " / " + newTime + " (normalized)");
+
         exoPlayer.seekTo(newTime);
-        JSONObject payload = Payload.seekEvent(Player.this.exoPlayer, newTime);
-        return payload;
+        return Payload.seekEvent(this.exoPlayer, newTime);
     }
 
     public JSONObject seekBy(long timeMillis) {
         long newTime = normalizeOffset(exoPlayer.getCurrentPosition() + timeMillis);
+        Log.i(TAG, "SEEK (by)" +  timeMillis  + " / " + newTime + " (normalized)");
+
         exoPlayer.seekTo(newTime);
-        JSONObject payload = Payload.seekEvent(Player.this.exoPlayer, newTime);
-        return payload;
+        return Payload.seekEvent(this.exoPlayer, newTime);
     }
 
     public JSONObject getPlayerState() {
@@ -433,5 +510,13 @@ public class Player {
         Log.e(TAG, msg);
         JSONObject payload = Payload.playerErrorEvent(Player.this.exoPlayer, null, msg);
         new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.ERROR, payload, true);
-    }   
+    }
+
+    public void setZIndex(int index) {
+        Log.i(TAG, "setZIndex: " + index);
+
+        exoView.setElevation(index);
+        exoView.invalidate();
+        this.parentLayout.invalidate();
+    }
 }

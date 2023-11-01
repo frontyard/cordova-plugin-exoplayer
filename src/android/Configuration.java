@@ -54,6 +54,10 @@ public class Configuration {
         return config.optBoolean("audioOnly");
     }
 
+    public boolean useInlineView() {
+        return config.optBoolean("inlineView", true);
+    }
+
     public boolean autoPlay() {
         return config.optBoolean("autoPlay", true);
     }

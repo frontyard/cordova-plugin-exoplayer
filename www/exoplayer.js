@@ -55,5 +55,8 @@ module.exports = {
     },
     close: function (successCallback, errorCallback) {
         cordova.exec(successCallback, errorCallback, "ExoPlayer", "close", []);
+    },
+    setZIndex: function(zIndex, successCallback, errorCallback) {
+        cordova.exec(successCallback, errorCallback, "ExoPlayer", "setZIndex", [zIndex]);
     }
 };

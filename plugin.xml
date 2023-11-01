@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         id="cordova-plugin-exoplayer"
-        version="2.5.4">
+        version="2.6.0">
 
     <name>ExoPlayer</name>
     <description>Cordova Plugin implementing ExoPlayer video/audio player</description>
@@ -19,7 +19,7 @@
     </js-module>
 
     <platform name="android">
-        <framework src="com.google.android.exoplayer:exoplayer:2.9.6"/>
+        <framework src="com.google.android.exoplayer:exoplayer:2.18.1"/>
         <framework src="com.squareup.picasso:picasso:2.5.2"/>
 
         <config-file target="res/xml/config.xml" parent="/*">
