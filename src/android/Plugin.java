@@ -23,6 +23,7 @@
  */
 package co.frontyard.cordova.plugin.exoplayer;
 
+import android.graphics.Color;
 import android.net.*;
 import android.view.ViewGroup;
 import org.apache.cordova.*;
@@ -43,6 +44,7 @@ public class Plugin extends CordovaPlugin {
                         }
                         JSONObject params = data.optJSONObject(0);
                         self.player = new Player(new Configuration(params), cordova.getActivity(), callbackContext, webView);
+                        webView.getView().setBackgroundColor(Color.TRANSPARENT);
                         self.player.createPlayer();
                         new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
                     }
@@ -175,8 +177,18 @@ public class Plugin extends CordovaPlugin {
                     }
                 });
                 return true;
-            }
-            else {
+            } else if (action.equals("setZIndex")) {
+                cordova.getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        if (self.player != null) {
+                            int zIndex = data.optInt(0);
+                            self.player.setZIndex(zIndex);
+                            new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
+                        }
+                    }
+                });
+                return true;
+            } else {
                 new CallbackResponse(callbackContext).send(PluginResult.Status.INVALID_ACTION, false);
                 return false;
             }

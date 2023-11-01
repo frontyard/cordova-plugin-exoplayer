@@ -9,6 +9,7 @@ Please send us links to your cool projects made with this plugin so we can inclu
 ## Keeping track of exoplayer versions here:
 |plugin|exoplayer|
 |-----|---------|
+|2.6.0|2.18.1|
 |2.5.6|2.9.6|
 |2.5.5|2.8.1|
 |2.5.4|2.6.1|

@@ -58,26 +58,12 @@ public class LayoutProvider {
             view.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
         }
 
-        if (view.getPlayer() == null) {
-            Log.i(TAG, "RIK - Player is still null -- view.getPlayer() returned null");
-        } else {
-            view.setPlayer(new ForwardingPlayer(view.getPlayer()) {
-                @Override
-                public long getSeekForwardIncrement() {
-                    return config.getForwardTimeMs();
-                }
+        view.setShowMultiWindowTimeBar(true);
+        view.setControllerHideOnTouch(true);
+        view.setControllerShowTimeoutMs(config.getHideTimeout());
 
-                @Override
-                public long getSeekBackIncrement() {
-                    return config.getRewindTimeMs();
-                }
-            });
-            view.setShowMultiWindowTimeBar(true);
-            view.setControllerHideOnTouch(true);
-            view.setControllerShowTimeoutMs(config.getHideTimeout());
+        setupController(view, activity, config.getController());
 
-            setupController(view, activity, config.getController());
-        }
         return view;
     }
 

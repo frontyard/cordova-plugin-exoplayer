@@ -23,6 +23,7 @@
  */
 package co.frontyard.cordova.plugin.exoplayer;
 
+import android.graphics.Color;
 import android.util.Log;
 import android.app.*;
 import android.content.*;
@@ -32,6 +33,7 @@ import android.view.*;
 import android.widget.*;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.ContentFrameLayout;
 
 import com.google.android.exoplayer2.*;
 import com.google.android.exoplayer2.source.*;
@@ -43,8 +45,7 @@ import com.google.android.exoplayer2.upstream.*;
 import com.google.android.exoplayer2.util.*;
 import com.google.android.exoplayer2.Player.PositionInfo;
 import java.lang.*;
-import java.lang.Math;
-import java.lang.Override;
+
 import org.apache.cordova.*;
 import org.json.*;
 
@@ -60,6 +61,7 @@ public class Player {
     private int controllerVisibility;
     private boolean paused = false;
     private AudioManager audioManager;
+    private ContentFrameLayout parentLayout;
 
     public Player(Configuration config, Activity activity, CallbackContext callbackContext, CordovaWebView webView) {
         this.config = config;
@@ -121,6 +123,8 @@ public class Player {
     private DialogInterface.OnDismissListener dismissListener = new DialogInterface.OnDismissListener() {
         @Override
         public void onDismiss(DialogInterface dialog) {
+            Log.i(TAG, "Player dialog dismissed");
+
             if (exoPlayer != null) {
                 exoPlayer.release();
             }
@@ -134,6 +138,8 @@ public class Player {
         @Override
         public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
             String key = KeyEvent.keyCodeToString(event.getKeyCode());
+            Log.i(TAG, "onKey listener " + keyCode + "/ '" + key + "'");
+
             // We need android to handle these key events
             if (key.equals("KEYCODE_VOLUME_UP") ||
                     key.equals("KEYCODE_VOLUME_DOWN") ||
@@ -192,10 +198,20 @@ public class Player {
     };
 
     public void createPlayer() {
-        if (!config.isAudioOnly()) {
+        Log.i(TAG, "Playing " + config.getUri());
+
+        if (config.useInlineView()) {
+            // Using a dialog doesn't work for us, as controls are drawn in HTML view (cordova ui)
+            createPlayerInCordovaUI();
+
+        } else if (!config.isAudioOnly()) {
             createDialog();
         }
         preparePlayer(config.getUri());
+
+        if (config.useInlineView()) {
+            setController(config.getController());
+        }
     }
 
     public void createDialog() {
@@ -228,6 +244,38 @@ public class Player {
         LayoutProvider.setupController(exoView, activity, config.getController());
     }
 
+    public void createPlayerInCordovaUI() {
+        exoView = LayoutProvider.getExoPlayerView(this.activity, config);
+        exoView.setControllerVisibilityListener(playbackControlVisibilityListener);
+
+        exoView.setElevation(99);
+        exoView.setVisibility(View.VISIBLE);
+        exoView.setBackgroundColor(Color.BLACK);
+
+        try {
+            View webViewImpl = webView.getEngine().getView();
+            Object webViewParent = webViewImpl.getParent();
+
+            Log.d(TAG, "Have a " + (webViewImpl == null ? "empty" : "valid") + " parent View");
+            if (webViewImpl != null) {
+                Log.d(TAG, "parentView is a " + webViewImpl.getClass().getCanonicalName());
+            }
+
+            // Cordova webview is in a ContentFrameLayout (for plugin version 12 it is)
+            parentLayout = (ContentFrameLayout)webViewParent;
+            parentLayout.addView(exoView);
+
+            // Keep controls on top of player.
+            webViewImpl.setElevation(101);
+        }
+        catch (Exception e) {
+            Log.e(TAG, "Problem adding exoplayer to cordova's webview containers: " + e.getMessage());
+        }
+
+        exoView.requestFocus();
+        exoView.setOnTouchListener(onTouchListener);
+    }
+
     private int setupAudio() {
         activity.setVolumeControlStream(AudioManager.STREAM_MUSIC);
         return audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
@@ -244,17 +292,30 @@ public class Player {
         exoPlayer = new ExoPlayer.Builder(this.activity).build();
         exoPlayer.addListener(playerEventListener);
         if (null != exoView) {
-            exoView.setPlayer(exoPlayer);
+            exoView.setPlayer(new ForwardingPlayer(exoPlayer) {
+                @Override
+                public long getSeekForwardIncrement() {
+                    Log.d(TAG, "ForwardingPlayer::getSeekForwardIncrement: " + config.getForwardTimeMs());
+                    return config.getForwardTimeMs();
+                }
+
+                @Override
+                public long getSeekBackIncrement() {
+                    Log.d(TAG, "ForwardingPlayer::getSeekBackIncrement: " + config.getRewindTimeMs());
+                    return config.getRewindTimeMs();
+                }
+            });
         }
 
         MediaSource mediaSource = getMediaSource(uri, bandwidthMeter);
         if (mediaSource != null) {
-            long offset = config.getSeekTo();
+            long startTimeMS = config.getSeekTo();
             boolean autoPlay = config.autoPlay();
-            if (offset > -1) {
-                exoPlayer.seekTo(offset);
+            if (startTimeMS > 0) {
+                exoPlayer.setMediaSource(mediaSource, startTimeMS);
+            } else {
+                exoPlayer.setMediaSource(mediaSource);
             }
-            exoPlayer.setMediaSource(mediaSource);
             exoPlayer.prepare();
 
             exoPlayer.setPlayWhenReady(autoPlay);
@@ -341,13 +402,20 @@ public class Player {
     }
 
     public void close() {
+        Log.i(TAG, "closing stream");
         audioManager.abandonAudioFocus(audioFocusChangeListener);
         if (exoPlayer != null) {
+            exoPlayer.setPlayWhenReady(false);
+            exoPlayer.stop();
             exoPlayer.release();
             exoPlayer = null;
         }
         if (this.dialog != null) {
             dialog.dismiss();
+        }
+
+        if (parentLayout != null && exoView != null) {
+            parentLayout.removeView(exoView);
         }
     }
 
@@ -372,6 +440,7 @@ public class Player {
     }
 
     private void pause() {
+
         if (null != exoPlayer) {
             paused = true;
             exoPlayer.setPlayWhenReady(false);
@@ -384,23 +453,31 @@ public class Player {
     }
 
     public void stop() {
+        Log.i(TAG, "STOP" +  ( (null == exoPlayer) ? " exoPlayer not yet initialized" : ""));
+
         paused = false;
         exoPlayer.stop();
     }
 
     private long normalizeOffset(long newTime) {
         long duration = exoPlayer.getDuration();
-        return duration == 0 ? 0 : Math.min(Math.max(0, newTime), duration);
+        if (duration == C.TIME_UNSET) return newTime;
+
+        return Math.min(Math.max(0, newTime), duration);
     }
 
     public JSONObject seekTo(long timeMillis) {
         long newTime = normalizeOffset(timeMillis);
+        Log.i(TAG, "SEEK (to) " +  timeMillis  + " / " + newTime + " (normalized)");
+
         exoPlayer.seekTo(newTime);
         return Payload.seekEvent(this.exoPlayer, newTime);
     }
 
     public JSONObject seekBy(long timeMillis) {
         long newTime = normalizeOffset(exoPlayer.getCurrentPosition() + timeMillis);
+        Log.i(TAG, "SEEK (by)" +  timeMillis  + " / " + newTime + " (normalized)");
+
         exoPlayer.seekTo(newTime);
         return Payload.seekEvent(this.exoPlayer, newTime);
     }
@@ -433,5 +510,13 @@ public class Player {
         Log.e(TAG, msg);
         JSONObject payload = Payload.playerErrorEvent(Player.this.exoPlayer, null, msg);
         new CallbackResponse(Player.this.callbackContext).send(PluginResult.Status.ERROR, payload, true);
-    }   
+    }
+
+    public void setZIndex(int index) {
+        Log.i(TAG, "setZIndex: " + index);
+
+        exoView.setElevation(index);
+        exoView.invalidate();
+        this.parentLayout.invalidate();
+    }
 }
